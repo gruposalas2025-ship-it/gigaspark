@@ -7,9 +7,14 @@ project(gigaspark_m7)
 
 target_sources(app PRIVATE
 	m7/src/main.c
+	m7/src/app_runner.c
+	m7/src/fault_manager.c
+	sdk/gigaspark_api.c
 )
+
 target_include_directories(app PRIVATE
 	m7/src
 	common
 	common/include
+	sdk
 )

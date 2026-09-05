@@ -2,8 +2,7 @@
  * Gigaspark OS - M7 Primary Core
  * STM32H747XI Cortex-M7 @ 480MHz
  *
- * Phase 5+6: IPC communication with M4 for app listing and loading.
- * Requests app list from M4 (which reads SD card), loads apps.
+ * Phase 9: IPC + App Runner with fault recovery + SDK
  */
 
 #include <zephyr/kernel.h>
@@ -11,11 +10,17 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/ipc/ipc_service.h>
 #include <zephyr/logging/log.h>
+#include <stdint.h>
 
 #include "ipc_config.h"
 #include "ipc_protocol.h"
+#include "fault_manager.h"
+#include "app_runner.h"
 
 LOG_MODULE_REGISTER(gigaspark_m7, CONFIG_LOG_DEFAULT_LEVEL);
+
+/* SDK init */
+extern void gigaspark_sdk_init(void);
 
 /* Green LED = PJ13 (alias led1) */
 static const struct gpio_dt_spec led_green = GPIO_DT_SPEC_GET(DT_ALIAS(led1), gpios);
@@ -89,6 +94,12 @@ int main(void)
 		return ret;
 	}
 
+	/* Initialize fault manager */
+	fault_manager_init();
+
+	/* Initialize SDK */
+	gigaspark_sdk_init();
+
 	/* Initialize IPC */
 	ipc_instance = DEVICE_DT_GET(DT_NODELABEL(ipc0));
 
@@ -107,11 +118,11 @@ int main(void)
 	LOG_INF("Waiting for M4 endpoint...");
 	k_sem_take(&bound_sem, K_FOREVER);
 
-	/* === Phase 5+6: App Listing and Loading === */
-	LOG_INF("=== Phase 5+6: App Manager ===");
+	/* === App Manager === */
+	LOG_INF("=== Gigaspark OS App Manager ===");
 
 	/* Step 1: Get app list from M4 */
-	LOG_INF("--- Step 1: Requesting app list ---");
+	LOG_INF("--- Requesting app list ---");
 
 	struct ipc_msg list_cmd = {
 		.cmd = CMD_GET_APP_LIST,
@@ -130,7 +141,7 @@ int main(void)
 
 		/* Step 2: Load first app if available */
 		if (app_count > 0) {
-			LOG_INF("--- Step 2: Loading app 0 ---");
+			LOG_INF("--- Loading app 0 ---");
 
 			struct ipc_msg load_cmd = {
 				.cmd = CMD_LOAD_APP,
@@ -145,6 +156,22 @@ int main(void)
 			} else if (resp.status == STATUS_OK) {
 				LOG_INF("App loaded: handle=0x%04x, size=%u bytes",
 					resp.handle, resp.size);
+
+				/* Execute app with fault recovery */
+				LOG_INF("Executing app with fault recovery...");
+				int app_result = app_runner_execute(
+					(const uint8_t *)(uintptr_t)resp.handle,
+					resp.size,
+					resp.handle
+				);
+
+				if (app_result == APP_RESULT_FAULT) {
+					LOG_WRN("App faulted - recovered, returning to launcher");
+				} else if (app_result == APP_RESULT_OK) {
+					LOG_INF("App exited normally");
+				} else {
+					LOG_ERR("App execution error: %d", app_result);
+				}
 			} else {
 				LOG_ERR("App load failed: status=%d", resp.status);
 			}
@@ -157,8 +184,8 @@ int main(void)
 	gpio_pin_set_dt(&led_green, 1);
 
 	LOG_INF("====================================================");
-	LOG_INF(" GIGASPARK OS PHASE 5+6 COMPLETE");
-	LOG_INF(" App Manager: SD -> M4 -> M7 via IPC");
+	LOG_INF(" GIGASPARK OS PHASE 9 COMPLETE");
+	LOG_INF(" App Runner + Fault Recovery + SDK");
 	LOG_INF(" M7 @ 480MHz | M4 @ 240MHz | IPC OK");
 	LOG_INF("====================================================");
 
