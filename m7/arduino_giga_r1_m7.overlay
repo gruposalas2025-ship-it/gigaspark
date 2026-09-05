@@ -3,7 +3,7 @@
  * Arduino Giga R1 (STM32H747XI M7)
  *
  * IPC via OpenAMP static vrings over SRAM4
- * SRAM4 marked non-cache for M7 (M4 has no cache)
+ * LVGL display configuration
  */
 
 #include <zephyr/dt-bindings/ipc_service/static_vrings.h>
@@ -19,9 +19,6 @@
 		compatible = "zephyr,memory-region", "mmio-sram";
 		reg = <0x38000000 DT_SIZE_K(64)>;
 		zephyr,memory-region = "SRAM4_IPC";
-		/* NOCACHE: M7 has D-cache, M4 does not. Without this,
-		 * stale cache lines corrupt IPC data.
-		 */
 		zephyr,memory-attr = <DT_MEM_ARM(ATTR_MPU_RAM_NOCACHE)>;
 	};
 
@@ -36,5 +33,11 @@
 			zephyr,buffer-size = <1024>;
 			status = "okay";
 		};
+	};
+
+	/* LVGL display configuration - references the LTDC */
+	zephyr,displays {
+		compatible = "zephyr,displays";
+		displays = <&ltdc>;
 	};
 };

@@ -2,12 +2,8 @@
  * Gigaspark OS - M7 Primary Core
  * STM32H747XI Cortex-M7 @ 480MHz
  *
- * Phase 4: 3-tier memory stress test.
- * Allocates 16 blocks of 512 bytes (8KB total) to force:
- *   - Tier 1 (4KB main pool) overflow -> compress to Tier 2
- *   - Tier 2 (2KB compressed pool) overflow -> evict to Tier 3 (SD)
- * Then reads back blocks 0, 8, and 15 to verify transparent
- * decompression from all three tiers.
+ * Phase 5+6: IPC communication with M4 for app listing and loading.
+ * Requests app list from M4 (which reads SD card), loads apps.
  */
 
 #include <zephyr/kernel.h>
@@ -33,9 +29,6 @@ static volatile bool ept_ready;
 /* Last response from M4 */
 static struct ipc_msg last_resp;
 
-/* Read buffer for CMD_READ responses */
-static uint8_t read_buf[MEM_IO_MAX];
-
 static void ept_bound(void *priv)
 {
 	ept_ready = true;
@@ -46,8 +39,6 @@ static void ept_bound(void *priv)
 static void ept_received(const void *data, size_t len, void *priv)
 {
 	if (len < sizeof(struct ipc_msg)) {
-		LOG_WRN("Received %zu bytes, expected %zu. Ignoring.",
-			len, sizeof(struct ipc_msg));
 		return;
 	}
 
@@ -116,105 +107,58 @@ int main(void)
 	LOG_INF("Waiting for M4 endpoint...");
 	k_sem_take(&bound_sem, K_FOREVER);
 
-	/* === Phase 4: 3-Tier Memory Stress Test === */
-	LOG_INF("=== Phase 4: 3-Tier Memory Stress Test ===");
+	/* === Phase 5+6: App Listing and Loading === */
+	LOG_INF("=== Phase 5+6: App Manager ===");
 
-	/*
-	 * Step 1: Allocate 16 blocks of 512 bytes (8KB total).
-	 * This exceeds both the 4KB main pool and 2KB compressed pool,
-	 * forcing eviction to SD card (Tier 3).
-	 */
-	uint16_t handles[16];
-	int alloc_count = 0;
+	/* Step 1: Get app list from M4 */
+	LOG_INF("--- Step 1: Requesting app list ---");
 
-	LOG_INF("--- Step 1: Allocating 16 x 512B (8KB) ---");
+	struct ipc_msg list_cmd = {
+		.cmd = CMD_GET_APP_LIST,
+		.handle = 0,
+		.size = 0,
+		.status = 0,
+	};
+	struct ipc_msg resp;
 
-	for (int i = 0; i < 16; i++) {
-		struct ipc_msg alloc_cmd = {
-			.cmd = CMD_ALLOC,
-			.size = 512,
-			.handle = 0,
-			.status = 0,
-		};
-		struct ipc_msg resp;
+	ret = send_cmd(&list_cmd, &resp);
+	if (ret < 0) {
+		LOG_ERR("Failed to get app list: %d", ret);
+	} else if (resp.status == STATUS_OK) {
+		int app_count = resp.size;
+		LOG_INF("Found %d app(s) on SD card", app_count);
 
-		ret = send_cmd(&alloc_cmd, &resp);
-		if (ret < 0 || resp.status != STATUS_OK) {
-			LOG_INF("Alloc[%d] failed (status=%d), stopping at %d",
-				i, resp.status, alloc_count);
-			break;
+		/* Step 2: Load first app if available */
+		if (app_count > 0) {
+			LOG_INF("--- Step 2: Loading app 0 ---");
+
+			struct ipc_msg load_cmd = {
+				.cmd = CMD_LOAD_APP,
+				.handle = 0,
+				.size = 0,
+				.status = 0,
+			};
+
+			ret = send_cmd(&load_cmd, &resp);
+			if (ret < 0) {
+				LOG_ERR("Failed to load app: %d", ret);
+			} else if (resp.status == STATUS_OK) {
+				LOG_INF("App loaded: handle=0x%04x, size=%u bytes",
+					resp.handle, resp.size);
+			} else {
+				LOG_ERR("App load failed: status=%d", resp.status);
+			}
 		}
-
-		handles[i] = resp.handle;
-		alloc_count++;
-		LOG_INF("Alloc[%d]: handle=0x%04x", i, resp.handle);
+	} else {
+		LOG_WRN("No apps available (status=%d)", resp.status);
 	}
 
-	LOG_INF("Allocated %d blocks (expected 16)", alloc_count);
-
-	/*
-	 * Step 2: Read blocks 0, 8, and 15 to verify 3-tier decompression.
-	 * Block 0: likely still in main pool or compressed pool
-	 * Block 8: likely compressed or swapped to SD
-	 * Block 15: likely swapped to SD
-	 */
-	LOG_INF("--- Step 2: Reading blocks 0, 8, 15 (3-tier test) ---");
-
-	int read_indices[] = {0, 8, 15};
-	for (int r = 0; r < 3; r++) {
-		int idx = read_indices[r];
-		if (idx >= alloc_count) {
-			LOG_INF("Block %d not allocated, skipping", idx);
-			continue;
-		}
-
-		struct ipc_msg read_cmd = {
-			.cmd = CMD_READ,
-			.handle = handles[idx],
-			.size = MEM_IO_MAX,
-			.status = 0,
-		};
-		struct ipc_msg resp;
-
-		ret = send_cmd(&read_cmd, &resp);
-		if (ret < 0) {
-			LOG_ERR("Read[%d] failed: %d", idx, ret);
-		} else if (resp.status == STATUS_OK) {
-			LOG_INF("Read[%d]: handle=0x%04x actual=%u bytes OK",
-				idx, resp.handle, resp.size);
-		} else {
-			LOG_ERR("Read[%d]: status=%d (error)", idx, resp.status);
-		}
-	}
-
-	/*
-	 * Step 3: Free all allocated blocks.
-	 */
-	LOG_INF("--- Step 3: Freeing all %d blocks ---", alloc_count);
-
-	for (int i = 0; i < alloc_count; i++) {
-		struct ipc_msg free_cmd = {
-			.cmd = CMD_FREE,
-			.handle = handles[i],
-			.size = 0,
-			.status = 0,
-		};
-		struct ipc_msg resp;
-
-		ret = send_cmd(&free_cmd, &resp);
-		if (ret < 0 || resp.status != STATUS_OK) {
-			LOG_ERR("Free handle=0x%04x failed", handles[i]);
-		}
-	}
-
-	LOG_INF("All %d blocks freed", alloc_count);
-
-	/* Step 4: Turn ON green LED - system verified */
+	/* Turn ON green LED - system ready */
 	gpio_pin_set_dt(&led_green, 1);
 
 	LOG_INF("====================================================");
-	LOG_INF(" GIGASPARK OS PHASE 4 COMPLETE");
-	LOG_INF(" 3-Tier Memory: RAM(4KB) -> zRAM(2KB) -> SD(swap)");
+	LOG_INF(" GIGASPARK OS PHASE 5+6 COMPLETE");
+	LOG_INF(" App Manager: SD -> M4 -> M7 via IPC");
 	LOG_INF(" M7 @ 480MHz | M4 @ 240MHz | IPC OK");
 	LOG_INF("====================================================");
 

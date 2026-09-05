@@ -2,13 +2,9 @@
  * Gigaspark OS - M4 Remote Core
  * STM32H747XI Cortex-M4 @ 240MHz
  *
- * Phase 4: 3-tier memory engine with SD swap.
- * Tier 1: 4KB main pool (live data)
- * Tier 2: 2KB compressed pool (RLE blobs)
- * Tier 3: SD card sectors (evicted compressed blobs)
- *
- * Receives CMD_ALLOC/CMD_FREE/CMD_READ/CMD_WRITE from M7 via IPC.
- * Returns opaque handles, never exposes real addresses to M7.
+ * Phase 5: File system manager + 3-tier memory engine.
+ * Serves app list and app binaries to M7 via IPC.
+ * Memory engine: RAM -> compressed_pool -> SD swap.
  */
 
 #include <zephyr/kernel.h>
@@ -19,6 +15,7 @@
 #include "ipc_config.h"
 #include "ipc_protocol.h"
 #include "mem_engine.h"
+#include "fs_manager.h"
 
 LOG_MODULE_REGISTER(gigaspark_m4, CONFIG_LOG_DEFAULT_LEVEL);
 
@@ -28,8 +25,9 @@ static K_SEM_DEFINE(data_sem, 0, 1);
 static struct ipc_ept ept;
 static volatile bool ept_ready;
 
-/* Buffer for CMD_READ responses */
-static uint8_t read_buf[MEM_IO_MAX];
+/* Buffers for IPC responses */
+static uint8_t io_buf[MEM_IO_MAX];
+static uint8_t app_buf[APP_BINARY_MAX_SIZE];
 
 /* Process an incoming IPC command and prepare the response */
 static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
@@ -39,25 +37,19 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 	switch (req->cmd) {
 	case CMD_ALLOC: {
 		uint16_t handle = mem_alloc(req->size);
-
 		resp->status = (handle != MEM_HANDLE_INVALID)
 			       ? STATUS_OK : STATUS_ERR_NOMEM;
 		resp->handle = handle;
 		resp->size = req->size;
-
-		LOG_INF("CMD_ALLOC size=%u -> handle=0x%04x status=%d",
-			req->size, handle, resp->status);
+		LOG_INF("CMD_ALLOC size=%u -> handle=0x%04x", req->size, handle);
 		break;
 	}
 	case CMD_FREE: {
 		int ret = mem_free(req->handle);
-
 		resp->status = (ret == 0) ? STATUS_OK : STATUS_ERR_BAD_HANDLE;
 		resp->handle = req->handle;
 		resp->size = 0;
-
-		LOG_INF("CMD_FREE handle=0x%04x -> status=%d",
-			req->handle, resp->status);
+		LOG_INF("CMD_FREE handle=0x%04x -> %d", req->handle, ret);
 		break;
 	}
 	case CMD_READ: {
@@ -65,37 +57,66 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 		if (to_read > MEM_IO_MAX) {
 			to_read = MEM_IO_MAX;
 		}
-
-		size_t actual = mem_read(req->handle, read_buf, to_read);
-
+		size_t actual = mem_read(req->handle, io_buf, to_read);
 		resp->handle = req->handle;
 		resp->size = actual;
-
-		if (actual > 0) {
-			resp->status = STATUS_OK;
-		} else {
-			resp->status = STATUS_ERR_READ_FAILED;
-		}
-
-		LOG_INF("CMD_READ handle=0x%04x size=%u -> actual=%u status=%d",
-			req->handle, to_read, actual, resp->status);
+		resp->status = (actual > 0) ? STATUS_OK : STATUS_ERR_READ_FAILED;
+		LOG_INF("CMD_READ handle=0x%04x -> %u bytes", req->handle, actual);
 		break;
 	}
 	case CMD_WRITE: {
-		/*
-		 * For Phase 4, CMD_WRITE uses the size field to carry
-		 * a simple pattern byte that the M4 uses to fill the block.
-		 * The actual data payload is not sent via IPC to keep
-		 * the message fixed-size.
-		 */
 		int ret = mem_write(req->handle, &req->size, sizeof(req->size));
-
 		resp->status = (ret == 0) ? STATUS_OK : STATUS_ERR_WRITE_FAILED;
 		resp->handle = req->handle;
 		resp->size = 0;
+		LOG_INF("CMD_WRITE handle=0x%04x -> %d", req->handle, ret);
+		break;
+	}
+	case CMD_GET_APP_LIST: {
+		/*
+		 * Respond with app count in size field.
+		 * The actual app list is sent in subsequent messages
+		 * to avoid exceeding RPMsg buffer size.
+		 */
+		int count = fs_get_app_count();
+		resp->status = (count > 0) ? STATUS_OK : STATUS_ERR_NO_APPS;
+		resp->size = count;
+		resp->handle = 0;
+		LOG_INF("CMD_GET_APP_LIST -> %d apps", count);
+		break;
+	}
+	case CMD_LOAD_APP: {
+		/*
+		 * Load app binary into memory and return handle.
+		 * req->handle contains the app id to load.
+		 */
+		uint8_t app_id = (uint8_t)(req->handle & 0xFF);
+		size_t loaded = fs_load_app(app_id, app_buf, sizeof(app_buf));
 
-		LOG_INF("CMD_WRITE handle=0x%04x -> status=%d",
-			req->handle, resp->status);
+		if (loaded == 0) {
+			resp->status = STATUS_ERR_APP_NOT_FOUND;
+			resp->handle = MEM_HANDLE_INVALID;
+			resp->size = 0;
+			LOG_INF("CMD_LOAD_APP id=%u -> NOT FOUND", app_id);
+		} else {
+			/* Allocate memory in the engine for the app */
+			uint16_t mem_handle = mem_alloc(loaded);
+			if (mem_handle == MEM_HANDLE_INVALID) {
+				resp->status = STATUS_ERR_NOMEM;
+				resp->handle = MEM_HANDLE_INVALID;
+				resp->size = 0;
+				LOG_INF("CMD_LOAD_APP id=%u -> NO MEMORY for %u bytes",
+					app_id, loaded);
+			} else {
+				/* Copy app data into allocated memory */
+				mem_write(mem_handle, app_buf, loaded);
+				resp->status = STATUS_OK;
+				resp->handle = mem_handle;
+				resp->size = loaded;
+				LOG_INF("CMD_LOAD_APP id=%u -> handle=0x%04x size=%u",
+					app_id, mem_handle, loaded);
+			}
+		}
 		break;
 	}
 	default:
@@ -154,6 +175,14 @@ int main(void)
 	/* Initialize memory engine (includes SD swap init) */
 	mem_init();
 
+	/* Initialize filesystem manager (mount SD, scan apps) */
+	ret = fs_init();
+	if (ret < 0) {
+		LOG_WRN("Filesystem init failed: %d (SD not available)", ret);
+	} else {
+		LOG_INF("Filesystem ready, %d app(s) found", fs_get_app_count());
+	}
+
 	/* Initialize IPC */
 	ipc_instance = DEVICE_DT_GET(DT_NODELABEL(ipc0));
 
@@ -171,9 +200,8 @@ int main(void)
 
 	LOG_INF("Waiting for M7 handshake...");
 	k_sem_take(&bound_sem, K_FOREVER);
-	LOG_INF("M4 3-tier memory engine ready. Waiting for commands...");
+	LOG_INF("M4 ready. Waiting for commands...");
 
-	/* Wait forever - commands are processed in ept_received callback */
 	while (1) {
 		k_sem_take(&data_sem, K_FOREVER);
 	}

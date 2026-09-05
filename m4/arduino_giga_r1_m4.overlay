@@ -3,6 +3,7 @@
  * Arduino Giga R1 (STM32H747XI M4)
  *
  * IPC via OpenAMP static vrings over SRAM4
+ * SPI1 with MicroSD card (D11 MOSI, D12 MISO, D13 SCK, D10 CS)
  */
 
 #include <zephyr/dt-bindings/ipc_service/static_vrings.h>
