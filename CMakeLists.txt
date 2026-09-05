@@ -6,4 +6,4 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(gigaspark_m7)
 
 target_sources(app PRIVATE m7/src/main.c)
-target_include_directories(app PRIVATE common)
+target_include_directories(app PRIVATE common common/include)
