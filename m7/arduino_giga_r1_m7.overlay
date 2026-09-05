@@ -1,0 +1,40 @@
+/*
+ * Gigaspark OS - M7 Device Tree Overlay
+ * Arduino Giga R1 (STM32H747XI M7)
+ *
+ * IPC via OpenAMP static vrings over SRAM4
+ * SRAM4 marked non-cache for M7 (M4 has no cache)
+ */
+
+#include <zephyr/dt-bindings/ipc_service/static_vrings.h>
+#include <zephyr/dt-bindings/memory-attr/memory-attr-arm.h>
+
+/ {
+	chosen {
+		zephyr,console = &usart1;
+	};
+
+	/* SRAM4: 64KB at 0x38000000 (D3 domain, shared between M7 and M4) */
+	sram4_ipc: memory@38000000 {
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0x38000000 DT_SIZE_K(64)>;
+		zephyr,memory-region = "SRAM4_IPC";
+		/* NOCACHE: M7 has D-cache, M4 does not. Without this,
+		 * stale cache lines corrupt IPC data.
+		 */
+		zephyr,memory-attr = <DT_MEM_ARM(ATTR_MPU_RAM_NOCACHE)>;
+	};
+};
+
+/* IPC node for OpenAMP static vrings */
+ipc {
+	ipc0: ipc0 {
+		compatible = "zephyr,ipc-openamp-static-vrings";
+		memory-region = <&sram4_ipc>;
+		mboxes = <&mailbox 0>, <&mailbox 1>;
+		mbox-names = "tx", "rx";
+		role = "host";
+		zephyr,buffer-size = <1024>;
+		status = "okay";
+	};
+};

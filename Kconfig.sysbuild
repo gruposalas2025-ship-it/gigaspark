@@ -1,0 +1,8 @@
+# Copyright 2026 Gigaspark OS
+# SPDX-License-Identifier: Apache-2.0
+
+source "share/sysbuild/Kconfig"
+
+config GIGASPARK_REMOTE_BOARD
+string
+	default "arduino_giga_r1/stm32h747xx/m4" if "$(BOARD)/$(BOARD_QUALIFIERS)" = "arduino_giga_r1/stm32h747xx/m7"
