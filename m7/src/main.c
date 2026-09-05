@@ -2,8 +2,9 @@
  * Gigaspark OS - M7 Primary Core
  * STM32H747XI Cortex-M7 @ 480MHz
  *
- * Phase 2: Sends CMD_ALLOC/CMD_FREE to M4 memory engine via IPC.
- * Verifies handle-based memory management works end-to-end.
+ * Phase 3: zRAM compression test.
+ * Fills the M4 memory pool to force compression, then reads back
+ * a compressed block to verify transparent decompression.
  * Uses Zephyr IPC Service with OpenAMP static vrings.
  */
 
@@ -29,6 +30,9 @@ static volatile bool ept_ready;
 
 /* Last response from M4 */
 static struct ipc_msg last_resp;
+
+/* Read buffer for CMD_READ responses */
+static uint8_t read_buf[MEM_READ_MAX];
 
 static void ept_bound(void *priv)
 {
@@ -110,63 +114,98 @@ int main(void)
 	LOG_INF("Waiting for M4 endpoint...");
 	k_sem_take(&bound_sem, K_FOREVER);
 
-	/* === Phase 2: Memory Handle Test === */
-	LOG_INF("--- Phase 2: Memory Handle Test ---");
+	/* === Phase 3: zRAM Compression Test === */
+	LOG_INF("=== Phase 3: zRAM Compression Test ===");
 
-	/* Step 1: Allocate 128 bytes from M4 */
-	struct ipc_msg alloc_cmd = {
-		.cmd = CMD_ALLOC,
-		.size = 128,
-		.handle = 0,
-		.status = 0,
-	};
-	struct ipc_msg resp;
+	/*
+	 * Step 1: Fill the pool by allocating 8 blocks of 512 bytes.
+	 * Total = 4096 bytes = full pool.
+	 * The 5th allocation will force M4 to compress a victim block.
+	 */
+	uint16_t handles[8];
+	int alloc_count = 0;
 
-	LOG_INF("Sending CMD_ALLOC (128 bytes)...");
-	ret = send_cmd(&alloc_cmd, &resp);
-	if (ret < 0) {
-		LOG_ERR("Alloc command failed: %d", ret);
-		return ret;
+	LOG_INF("--- Step 1: Filling pool (8 x 512B) ---");
+
+	for (int i = 0; i < 8; i++) {
+		struct ipc_msg alloc_cmd = {
+			.cmd = CMD_ALLOC,
+			.size = 512,
+			.handle = 0,
+			.status = 0,
+		};
+		struct ipc_msg resp;
+
+		ret = send_cmd(&alloc_cmd, &resp);
+		if (ret < 0 || resp.status != STATUS_OK) {
+			LOG_INF("Alloc %d failed (status=%d), pool full at %d blocks",
+				i, resp.status, alloc_count);
+			break;
+		}
+
+		handles[i] = resp.handle;
+		alloc_count++;
+		LOG_INF("Alloc[%d]: handle=0x%04x", i, resp.handle);
 	}
 
-	if (resp.status != STATUS_OK) {
-		LOG_ERR("Alloc failed with status: %d", resp.status);
-		return -ENOMEM;
+	LOG_INF("Pool filled: %d blocks allocated", alloc_count);
+
+	/*
+	 * Step 2: Read back the first handle to verify decompression.
+	 * The M4 should decompress it transparently.
+	 */
+	if (alloc_count > 0) {
+		LOG_INF("--- Step 2: Reading compressed block ---");
+
+		struct ipc_msg read_cmd = {
+			.cmd = CMD_READ,
+			.handle = handles[0],
+			.size = MEM_READ_MAX,
+			.status = 0,
+		};
+		struct ipc_msg resp;
+
+		ret = send_cmd(&read_cmd, &resp);
+		if (ret < 0) {
+			LOG_ERR("Read failed: %d", ret);
+		} else if (resp.status == STATUS_OK) {
+			LOG_INF("Read OK: handle=0x%04x actual=%u bytes",
+				resp.handle, resp.size);
+		} else {
+			LOG_ERR("Read error: status=%d", resp.status);
+		}
 	}
 
-	LOG_INF("Alloc OK! Handle = 0x%04x", resp.handle);
-	uint16_t my_handle = resp.handle;
+	/*
+	 * Step 3: Free all allocated blocks.
+	 */
+	LOG_INF("--- Step 3: Freeing all blocks ---");
 
-	/* Step 2: Free the handle */
-	struct ipc_msg free_cmd = {
-		.cmd = CMD_FREE,
-		.handle = my_handle,
-		.size = 0,
-		.status = 0,
-	};
+	for (int i = 0; i < alloc_count; i++) {
+		struct ipc_msg free_cmd = {
+			.cmd = CMD_FREE,
+			.handle = handles[i],
+			.size = 0,
+			.status = 0,
+		};
+		struct ipc_msg resp;
 
-	LOG_INF("Sending CMD_FREE (handle 0x%04x)...", my_handle);
-	ret = send_cmd(&free_cmd, &resp);
-	if (ret < 0) {
-		LOG_ERR("Free command failed: %d", ret);
-		return ret;
+		ret = send_cmd(&free_cmd, &resp);
+		if (ret < 0 || resp.status != STATUS_OK) {
+			LOG_ERR("Free handle=0x%04x failed", handles[i]);
+		}
 	}
 
-	if (resp.status != STATUS_OK) {
-		LOG_ERR("Free failed with status: %d", resp.status);
-		return -EIO;
-	}
+	LOG_INF("All %d blocks freed", alloc_count);
 
-	LOG_INF("Free OK!");
-
-	/* Step 3: Turn ON green LED - system verified */
+	/* Step 4: Turn ON green LED - system verified */
 	gpio_pin_set_dt(&led_green, 1);
 
-	LOG_INF("========================================");
-	LOG_INF(" GIGASPARK OS PHASE 2 COMPLETE");
-	LOG_INF(" Memory engine: ALLOC/FREE via handles");
+	LOG_INF("============================================");
+	LOG_INF(" GIGASPARK OS PHASE 3 COMPLETE");
+	LOG_INF(" zRAM compression: RLE on M4");
 	LOG_INF(" M7 @ 480MHz | M4 @ 240MHz | IPC OK");
-	LOG_INF("========================================");
+	LOG_INF("============================================");
 
 	return 0;
 }

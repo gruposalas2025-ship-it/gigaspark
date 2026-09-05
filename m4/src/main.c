@@ -2,9 +2,10 @@
  * Gigaspark OS - M4 Remote Core
  * STM32H747XI Cortex-M4 @ 240MHz
  *
- * Memory engine: receives CMD_ALLOC/CMD_FREE from M7 via IPC,
- * manages a static 4KB pool, returns opaque handles.
- * Uses Zephyr IPC Service with OpenAMP static vrings.
+ * Phase 3: Memory engine with zRAM compression.
+ * Receives CMD_ALLOC/CMD_FREE/CMD_READ from M7 via IPC.
+ * Manages a static 4KB pool with automatic RLE compression.
+ * Returns opaque handles, never exposes real addresses to M7.
  */
 
 #include <zephyr/kernel.h>
@@ -23,6 +24,9 @@ static K_SEM_DEFINE(data_sem, 0, 1);
 
 static struct ipc_ept ept;
 static volatile bool ept_ready;
+
+/* Buffer for CMD_READ responses */
+static uint8_t read_buf[MEM_READ_MAX];
 
 /* Process an incoming IPC command and prepare the response */
 static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
@@ -51,6 +55,27 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 
 		LOG_INF("CMD_FREE handle=0x%04x -> status=%d",
 			req->handle, resp->status);
+		break;
+	}
+	case CMD_READ: {
+		size_t to_read = req->size;
+		if (to_read > MEM_READ_MAX) {
+			to_read = MEM_READ_MAX;
+		}
+
+		size_t actual = mem_read(req->handle, read_buf, to_read);
+
+		resp->handle = req->handle;
+		resp->size = actual;
+
+		if (actual > 0) {
+			resp->status = STATUS_OK;
+		} else {
+			resp->status = STATUS_ERR_READ_FAILED;
+		}
+
+		LOG_INF("CMD_READ handle=0x%04x size=%u -> actual=%u status=%d",
+			req->handle, to_read, actual, resp->status);
 		break;
 	}
 	default:
@@ -106,7 +131,7 @@ int main(void)
 
 	LOG_INF("Gigaspark OS M4 Remote Core starting...");
 
-	/* Initialize memory engine */
+	/* Initialize memory engine with compression */
 	mem_init();
 
 	/* Initialize IPC */
@@ -126,7 +151,7 @@ int main(void)
 
 	LOG_INF("Waiting for M7 handshake...");
 	k_sem_take(&bound_sem, K_FOREVER);
-	LOG_INF("M4 memory engine ready. Waiting for commands...");
+	LOG_INF("M4 memory engine (zRAM) ready. Waiting for commands...");
 
 	/* Wait forever - commands are processed in ept_received callback */
 	while (1) {
