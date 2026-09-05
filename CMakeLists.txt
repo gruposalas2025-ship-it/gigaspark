@@ -9,6 +9,8 @@ target_sources(app PRIVATE
 	m7/src/main.c
 	m7/src/app_runner.c
 	m7/src/fault_manager.c
+	m7/src/net_manager.c
+	m7/src/app_downloader.c
 	sdk/gigaspark_api.c
 )
 

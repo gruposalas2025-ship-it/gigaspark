@@ -2,8 +2,8 @@
  * Gigaspark OS - M4 Remote Core
  * STM32H747XI Cortex-M4 @ 240MHz
  *
- * Phase 5: File system manager + 3-tier memory engine.
- * Serves app list and app binaries to M7 via IPC.
+ * Phase 10: File system manager + 3-tier memory engine + file write.
+ * Serves app list, app binaries, and file operations to M7 via IPC.
  * Memory engine: RAM -> compressed_pool -> SD swap.
  */
 
@@ -28,6 +28,9 @@ static volatile bool ept_ready;
 /* Buffers for IPC responses */
 static uint8_t io_buf[MEM_IO_MAX];
 static uint8_t app_buf[APP_BINARY_MAX_SIZE];
+
+/* Shared buffer for file write chunks from M7 */
+uint8_t g_file_write_buf[FILE_WRITE_CHUNK_MAX];
 
 /* Process an incoming IPC command and prepare the response */
 static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
@@ -116,6 +119,63 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 				LOG_INF("CMD_LOAD_APP id=%u -> handle=0x%04x size=%u",
 					app_id, mem_handle, loaded);
 			}
+		}
+		break;
+	}
+	case CMD_FILE_OPEN: {
+		/*
+		 * Open a file for writing on SD card.
+		 * The filename is passed in the first 4 bytes of size field.
+		 * In practice, we'll use a fixed name for now.
+		 */
+		char filename[32];
+		snprintf(filename, sizeof(filename), "app_%04x.bin", req->handle);
+
+		int fd = fs_file_open(filename);
+		if (fd >= 0) {
+			resp->status = STATUS_OK;
+			resp->handle = (uint16_t)fd;
+			resp->size = 0;
+			LOG_INF("CMD_FILE_OPEN %s -> fd=%d", filename, fd);
+		} else {
+			resp->status = STATUS_ERR_FILE_OPEN;
+			resp->handle = MEM_HANDLE_INVALID;
+			resp->size = 0;
+			LOG_ERR("CMD_FILE_OPEN %s -> %d", filename, fd);
+		}
+		break;
+	}
+	case CMD_FILE_WRITE: {
+		/*
+		 * Write data to an open file.
+		 * The data payload follows the IPC message.
+		 * For simplicity, we'll read from a shared buffer.
+		 */
+		extern uint8_t g_file_write_buf[FILE_WRITE_CHUNK_MAX];
+
+		int written = fs_file_write(req->handle, g_file_write_buf, req->size);
+		if (written > 0) {
+			resp->status = STATUS_OK;
+			resp->size = written;
+			LOG_DBG("CMD_FILE_WRITE fd=%d -> %d bytes", req->handle, written);
+		} else {
+			resp->status = STATUS_ERR_FILE_WRITE;
+			resp->size = 0;
+			LOG_ERR("CMD_FILE_WRITE fd=%d -> %d", req->handle, written);
+		}
+		break;
+	}
+	case CMD_FILE_CLOSE: {
+		/*
+		 * Close an open file.
+		 */
+		int ret = fs_file_close(req->handle);
+		if (ret == 0) {
+			resp->status = STATUS_OK;
+			LOG_INF("CMD_FILE_CLOSE fd=%d -> OK", req->handle);
+		} else {
+			resp->status = STATUS_ERR_FILE_CLOSE;
+			LOG_ERR("CMD_FILE_CLOSE fd=%d -> %d", req->handle, ret);
 		}
 		break;
 	}

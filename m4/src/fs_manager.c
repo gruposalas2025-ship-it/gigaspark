@@ -206,3 +206,84 @@ int fs_is_ready(void)
 {
 	return fs_mounted ? 0 : -ENODEV;
 }
+
+/* ---- File Write Support ---- */
+
+/* Open file descriptors (simple: only 1 at a time) */
+static struct fs_file_t write_files[1];
+static bool write_file_open[1] = { false };
+
+int fs_file_open(const char *filename)
+{
+	if (!fs_mounted || filename == NULL) {
+		return -ENODEV;
+	}
+
+	/* Find free slot */
+	int fd = -1;
+	for (int i = 0; i < 1; i++) {
+		if (!write_file_open[i]) {
+			fd = i;
+			break;
+		}
+	}
+
+	if (fd < 0) {
+		LOG_ERR("No free file descriptors");
+		return -ENOMEM;
+	}
+
+	/* Build full path */
+	char path[64];
+	snprintf(path, sizeof(path), "%s/%s", APPS_DIR, filename);
+
+	/* Open file for writing */
+	memset(&write_files[fd], 0, sizeof(write_files[fd]));
+	int ret = fs_open(&write_files[fd], path, FS_O_CREATE | FS_O_WRITE);
+	if (ret < 0) {
+		LOG_ERR("Cannot open %s for writing: %d", path, ret);
+		return ret;
+	}
+
+	write_file_open[fd] = true;
+	LOG_INF("File opened for writing: %s (fd=%d)", path, fd);
+	return fd;
+}
+
+int fs_file_write(int fd, const uint8_t *data, size_t len)
+{
+	if (fd < 0 || fd >= 1 || !write_file_open[fd]) {
+		return -EBADF;
+	}
+
+	if (data == NULL || len == 0) {
+		return -EINVAL;
+	}
+
+	ssize_t written = fs_write(&write_files[fd], data, len);
+	if (written < 0) {
+		LOG_ERR("Write error: %d", (int)written);
+		return (int)written;
+	}
+
+	LOG_DBG("Wrote %d bytes to fd %d", (int)written, fd);
+	return (int)written;
+}
+
+int fs_file_close(int fd)
+{
+	if (fd < 0 || fd >= 1 || !write_file_open[fd]) {
+		return -EBADF;
+	}
+
+	int ret = fs_close(&write_files[fd]);
+	write_file_open[fd] = false;
+
+	if (ret < 0) {
+		LOG_ERR("Close error: %d", ret);
+		return ret;
+	}
+
+	LOG_INF("File closed: fd=%d", fd);
+	return 0;
+}

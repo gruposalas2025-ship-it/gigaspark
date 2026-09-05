@@ -2,7 +2,7 @@
  * Gigaspark OS - M7 Primary Core
  * STM32H747XI Cortex-M7 @ 480MHz
  *
- * Phase 9: IPC + App Runner with fault recovery + SDK
+ * Phase 10: IPC + App Runner + WiFi Downloader
  */
 
 #include <zephyr/kernel.h>
@@ -10,12 +10,13 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/ipc/ipc_service.h>
 #include <zephyr/logging/log.h>
-#include <stdint.h>
 
 #include "ipc_config.h"
 #include "ipc_protocol.h"
 #include "fault_manager.h"
 #include "app_runner.h"
+#include "net_manager.h"
+#include "app_downloader.h"
 
 LOG_MODULE_REGISTER(gigaspark_m7, CONFIG_LOG_DEFAULT_LEVEL);
 
@@ -33,6 +34,9 @@ static volatile bool ept_ready;
 
 /* Last response from M4 */
 static struct ipc_msg last_resp;
+
+/* Shared buffer for file writes */
+uint8_t g_file_write_buf[FILE_WRITE_CHUNK_MAX];
 
 static void ept_bound(void *priv)
 {
@@ -60,7 +64,7 @@ static struct ipc_ept_cfg ept_cfg = {
 };
 
 /* Send a command to M4 and wait for response */
-static int send_cmd(struct ipc_msg *cmd, struct ipc_msg *resp)
+int send_ipc_cmd(struct ipc_msg *cmd, struct ipc_msg *resp)
 {
 	int ret;
 
@@ -100,6 +104,13 @@ int main(void)
 	/* Initialize SDK */
 	gigaspark_sdk_init();
 
+	/* Initialize network */
+	LOG_INF("Initializing network...");
+	ret = net_manager_init();
+	if (ret < 0) {
+		LOG_WRN("Network init failed: %d", ret);
+	}
+
 	/* Initialize IPC */
 	ipc_instance = DEVICE_DT_GET(DT_NODELABEL(ipc0));
 
@@ -118,12 +129,40 @@ int main(void)
 	LOG_INF("Waiting for M4 endpoint...");
 	k_sem_take(&bound_sem, K_FOREVER);
 
+	/* === WiFi Connection === */
+	LOG_INF("=== Connecting to WiFi ===");
+
+	ret = net_connect_wifi("Gigaspark-AP", "gigaspark123");
+	if (ret < 0) {
+		LOG_WRN("WiFi connection failed: %d", ret);
+	} else {
+		LOG_INF("Waiting for IP address...");
+		ret = net_wait_ip(10000);  /* 10 second timeout */
+		if (ret < 0) {
+			LOG_WRN("Failed to get IP: %d", ret);
+		} else {
+			char ip[16];
+			net_get_ip_str(ip, sizeof(ip));
+			LOG_INF("Connected! IP: %s", ip);
+
+			/* Try to download an app */
+			LOG_INF("=== Downloading app from server ===");
+			ret = download_app_from_url(
+				"192.168.1.100", 80,
+				"/apps/clicker.bin", "clicker.bin"
+			);
+			if (ret < 0) {
+				LOG_WRN("Download failed: %d", ret);
+			} else {
+				LOG_INF("App downloaded successfully!");
+			}
+		}
+	}
+
 	/* === App Manager === */
 	LOG_INF("=== Gigaspark OS App Manager ===");
 
-	/* Step 1: Get app list from M4 */
-	LOG_INF("--- Requesting app list ---");
-
+	/* Get app list from M4 */
 	struct ipc_msg list_cmd = {
 		.cmd = CMD_GET_APP_LIST,
 		.handle = 0,
@@ -132,14 +171,14 @@ int main(void)
 	};
 	struct ipc_msg resp;
 
-	ret = send_cmd(&list_cmd, &resp);
+	ret = send_ipc_cmd(&list_cmd, &resp);
 	if (ret < 0) {
 		LOG_ERR("Failed to get app list: %d", ret);
 	} else if (resp.status == STATUS_OK) {
 		int app_count = resp.size;
 		LOG_INF("Found %d app(s) on SD card", app_count);
 
-		/* Step 2: Load first app if available */
+		/* Load and execute first app if available */
 		if (app_count > 0) {
 			LOG_INF("--- Loading app 0 ---");
 
@@ -150,10 +189,8 @@ int main(void)
 				.status = 0,
 			};
 
-			ret = send_cmd(&load_cmd, &resp);
-			if (ret < 0) {
-				LOG_ERR("Failed to load app: %d", ret);
-			} else if (resp.status == STATUS_OK) {
+			ret = send_ipc_cmd(&load_cmd, &resp);
+			if (ret == 0 && resp.status == STATUS_OK) {
 				LOG_INF("App loaded: handle=0x%04x, size=%u bytes",
 					resp.handle, resp.size);
 
@@ -172,20 +209,16 @@ int main(void)
 				} else {
 					LOG_ERR("App execution error: %d", app_result);
 				}
-			} else {
-				LOG_ERR("App load failed: status=%d", resp.status);
 			}
 		}
-	} else {
-		LOG_WRN("No apps available (status=%d)", resp.status);
 	}
 
 	/* Turn ON green LED - system ready */
 	gpio_pin_set_dt(&led_green, 1);
 
 	LOG_INF("====================================================");
-	LOG_INF(" GIGASPARK OS PHASE 9 COMPLETE");
-	LOG_INF(" App Runner + Fault Recovery + SDK");
+	LOG_INF(" GIGASPARK OS PHASE 10 COMPLETE");
+	LOG_INF(" WiFi + App Downloader + Fault Recovery");
 	LOG_INF(" M7 @ 480MHz | M4 @ 240MHz | IPC OK");
 	LOG_INF("====================================================");
 

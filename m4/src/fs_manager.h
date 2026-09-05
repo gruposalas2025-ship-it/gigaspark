@@ -51,4 +51,30 @@ size_t fs_load_app(uint8_t id, uint8_t *buf, size_t buf_size);
  */
 int fs_is_ready(void);
 
+/*
+ * Open a file for writing.
+ *
+ * @param filename  Name of the file (relative to /SD:/apps/).
+ * @return          File descriptor (>= 0) or negative error code.
+ */
+int fs_file_open(const char *filename);
+
+/*
+ * Write data to an open file.
+ *
+ * @param fd    File descriptor from fs_file_open.
+ * @param data  Data to write.
+ * @param len   Number of bytes to write.
+ * @return      Number of bytes written, or negative error code.
+ */
+int fs_file_write(int fd, const uint8_t *data, size_t len);
+
+/*
+ * Close an open file.
+ *
+ * @param fd    File descriptor from fs_file_open.
+ * @return      0 on success, negative error code.
+ */
+int fs_file_close(int fd);
+
 #endif /* GIGASPARK_FS_MANAGER_H */

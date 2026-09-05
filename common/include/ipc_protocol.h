@@ -16,6 +16,9 @@ enum ipc_cmd {
 	CMD_WRITE         = 0x04,  /* M7 -> M4: write data to handle */
 	CMD_GET_APP_LIST  = 0x10,  /* M7 -> M4: get list of apps from SD */
 	CMD_LOAD_APP      = 0x11,  /* M7 -> M4: load app binary by id */
+	CMD_FILE_OPEN     = 0x20,  /* M7 -> M4: open file for writing */
+	CMD_FILE_WRITE    = 0x21,  /* M7 -> M4: write data chunk to file */
+	CMD_FILE_CLOSE    = 0x22,  /* M7 -> M4: close file */
 	CMD_RESPONSE      = 0x80,  /* M4 -> M7: response with data */
 };
 
@@ -30,13 +33,17 @@ enum ipc_status {
 	STATUS_ERR_WRITE_FAILED = -6,
 	STATUS_ERR_NO_APPS     = -7,
 	STATUS_ERR_APP_NOT_FOUND = -8,
+	STATUS_ERR_FILE_OPEN   = -9,
+	STATUS_ERR_FILE_WRITE  = -10,
+	STATUS_ERR_FILE_CLOSE  = -11,
+	STATUS_ERR_NO_SD       = -12,
 };
 
 /* IPC message structure (fixed size for OpenAMP safety) */
 struct __packed ipc_msg {
 	uint8_t  cmd;       /* enum ipc_cmd */
 	int8_t   status;    /* enum ipc_status (response only) */
-	uint16_t handle;    /* opaque memory handle */
+	uint16_t handle;    /* opaque memory handle or file descriptor */
 	uint32_t size;      /* requested/actual size */
 };
 
@@ -66,5 +73,11 @@ struct __packed app_info {
 
 /* Max app binary size loadable into memory */
 #define APP_BINARY_MAX_SIZE  4096
+
+/* File write chunk size (must fit in IPC message with overhead) */
+#define FILE_WRITE_CHUNK_MAX  24
+
+/* File path on SD card */
+#define SD_APPS_PATH  "/SD:/apps/"
 
 #endif /* GIGASPARK_IPC_PROTOCOL_H */
