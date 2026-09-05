@@ -1,0 +1,2993 @@
+
+---
+events:
+  -
+    kind: "find_package-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:28 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    name: "ZephyrBuildConfiguration"
+    configs:
+      -
+        filename: "ZephyrBuild.cps"
+        kind: "cps"
+      -
+        filename: "zephyrbuild.cps"
+        kind: "cps"
+      -
+        filename: "ZephyrBuildConfig.cmake"
+        kind: "cmake"
+      -
+        filename: "zephyrbuild-config.cmake"
+        kind: "cmake"
+    version_request:
+      exact: false
+    settings:
+      required: "optional"
+      quiet: true
+      global: false
+      policy_scope: false
+      bypass_provider: false
+      names:
+        - "ZephyrBuild"
+      search_paths:
+        - "/home/gabo/zephyr-ws/zephyr/../*"
+      path_suffixes:
+        - ""
+      paths:
+        CMAKE_FIND_USE_CMAKE_PATH: true
+        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: false
+        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: false
+        CMAKE_FIND_USE_INSTALL_PREFIX: true
+        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
+        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: false
+        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: false
+        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
+    candidates:
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/ZephyrBuildConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/zephyrbuild-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/lib/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/lib/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/share/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/share/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/.west/ZephyrBuildConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/.west/zephyrbuild-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/.west/lib/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/.west/lib/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/.west/share/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/.west/share/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/ZephyrBuildConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/zephyrbuild-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/cmake/ZephyrBuildConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/cmake/zephyrbuild-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/lib/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/lib/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/modules/ZephyrBuildConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/modules/zephyrbuild-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/modules/lib/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/modules/lib/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/modules/share/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/modules/share/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/tools/ZephyrBuildConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/tools/zephyrbuild-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/tools/lib/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/tools/lib/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/tools/share/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/tools/share/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/bootloader/ZephyrBuildConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/bootloader/zephyrbuild-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/bootloader/lib/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/bootloader/lib/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/bootloader/share/cps/ZephyrBuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/bootloader/share/cps/zephyrbuild.cps"
+        mode: "cps"
+        reason: "no_exist"
+    found: null
+    search_context:
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find_package-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:41 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    name: "ZephyrAppConfiguration"
+    configs:
+      -
+        filename: "ZephyrApp.cps"
+        kind: "cps"
+      -
+        filename: "zephyrapp.cps"
+        kind: "cps"
+      -
+        filename: "ZephyrAppConfig.cmake"
+        kind: "cmake"
+      -
+        filename: "zephyrapp-config.cmake"
+        kind: "cmake"
+    version_request:
+      exact: false
+    settings:
+      required: "optional"
+      quiet: true
+      global: false
+      policy_scope: false
+      bypass_provider: false
+      names:
+        - "ZephyrApp"
+      search_paths:
+        - "/home/gabo/gigaspark_os/m4"
+      path_suffixes:
+        - ""
+      paths:
+        CMAKE_FIND_USE_CMAKE_PATH: true
+        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: false
+        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: false
+        CMAKE_FIND_USE_INSTALL_PREFIX: true
+        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
+        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: false
+        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: false
+        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
+    candidates:
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/ZephyrAppConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/zephyrapp-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/lib/cps/ZephyrApp.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/lib/cps/zephyrapp.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/share/cps/ZephyrApp.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/share/cps/zephyrapp.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/m4/ZephyrAppConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/m4/zephyrapp-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/m4/lib/cps/ZephyrApp.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/m4/lib/cps/zephyrapp.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/m4/share/cps/ZephyrApp.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/m4/share/cps/zephyrapp.cps"
+        mode: "cps"
+        reason: "no_exist"
+    found: null
+    search_context:
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/ccache.cmake:10 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CCACHE_FOUND"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ccache"
+    candidate_directories:
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/.venvs/zephyr/bin/ccache"
+      - "/home/gabo/.bun/bin/ccache"
+      - "/home/gabo/.local/bin/ccache"
+      - "/home/gabo/.opencode/bin/ccache"
+      - "/usr/local/sbin/ccache"
+      - "/usr/local/bin/ccache"
+    found: "/usr/bin/ccache"
+    search_context:
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find_package-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindZephyr-sdk.cmake:81 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindHostTools.cmake:51 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/dts.cmake:9 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    name: "Zephyr-sdk"
+    components:
+      -
+        name: "LOAD"
+        required: false
+        found: false
+    configs:
+      -
+        filename: "Zephyr-sdk.cps"
+        kind: "cps"
+      -
+        filename: "zephyr-sdk.cps"
+        kind: "cps"
+      -
+        filename: "Zephyr-sdkConfig.cmake"
+        kind: "cmake"
+      -
+        filename: "zephyr-sdk-config.cmake"
+        kind: "cmake"
+    version_request:
+      version: "1.0"
+      version_complete: "1.0"
+      exact: false
+    settings:
+      required: "required_explicit"
+      quiet: true
+      global: false
+      policy_scope: true
+      bypass_provider: false
+      hints:
+        - "/home/gabo/zephyr-sdk-1.0.1"
+      names:
+        - "Zephyr-sdk"
+      path_suffixes:
+        - ""
+      paths:
+        CMAKE_FIND_USE_CMAKE_PATH: true
+        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+        CMAKE_FIND_USE_INSTALL_PREFIX: true
+        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
+        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: true
+        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: true
+        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
+    candidates:
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/Zephyr-sdkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/zephyr-sdk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/lib/cps/Zephyr-sdk.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/lib/cps/zephyr-sdk.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/share/cps/Zephyr-sdk.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/share/cps/zephyr-sdk.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-sdk-1.0.1/Zephyr-sdkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-sdk-1.0.1/zephyr-sdk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+    found:
+      path: "/home/gabo/zephyr-sdk-1.0.1/cmake/Zephyr-sdkConfig.cmake"
+      mode: "config"
+      version: "1.0.1"
+    search_context:
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindHostTools.cmake:54 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/dts.cmake:9 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "GPERF"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gperf"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/gperf"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/gperf"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/gperf"
+      - "/home/gabo/.venvs/zephyr/bin/gperf"
+      - "/home/gabo/.bun/bin/gperf"
+      - "/home/gabo/.local/bin/gperf"
+      - "/home/gabo/.opencode/bin/gperf"
+      - "/usr/local/sbin/gperf"
+      - "/usr/local/bin/gperf"
+    found: "/usr/bin/gperf"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindHostTools.cmake:57 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/dts.cmake:9 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "OPENOCD"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "openocd"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/openocd"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/openocd"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/openocd"
+      - "/home/gabo/.venvs/zephyr/bin/openocd"
+      - "/home/gabo/.bun/bin/openocd"
+      - "/home/gabo/.local/bin/openocd"
+      - "/home/gabo/.opencode/bin/openocd"
+      - "/usr/local/sbin/openocd"
+      - "/usr/local/bin/openocd"
+      - "/usr/bin/openocd"
+      - "/usr/bin/site_perl/openocd"
+      - "/usr/bin/vendor_perl/openocd"
+      - "/usr/bin/core_perl/openocd"
+    found: false
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindHostTools.cmake:60 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/dts.cmake:9 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "BOSSAC"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "bossac"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/bossac"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/bossac"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bossac"
+      - "/home/gabo/.venvs/zephyr/bin/bossac"
+      - "/home/gabo/.bun/bin/bossac"
+      - "/home/gabo/.local/bin/bossac"
+      - "/home/gabo/.opencode/bin/bossac"
+      - "/usr/local/sbin/bossac"
+      - "/usr/local/bin/bossac"
+      - "/usr/bin/bossac"
+      - "/usr/bin/site_perl/bossac"
+      - "/usr/bin/vendor_perl/bossac"
+      - "/usr/bin/core_perl/bossac"
+    found: false
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindHostTools.cmake:65 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/dts.cmake:9 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "IMGTOOL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "imgtool.py"
+      - "imgtool"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/zephyr-ws/bootloader/mcuboot/scripts/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/imgtool.py"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/imgtool"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/imgtool.py"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/imgtool"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/imgtool.py"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/imgtool"
+    found: "/home/gabo/zephyr-ws/bootloader/mcuboot/scripts/imgtool.py"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindHostTools.cmake:68 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/dts.cmake:9 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "PTY_INTERFACE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "winpty"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/winpty"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/winpty"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/winpty"
+      - "/home/gabo/.venvs/zephyr/bin/winpty"
+      - "/home/gabo/.bun/bin/winpty"
+      - "/home/gabo/.local/bin/winpty"
+      - "/home/gabo/.opencode/bin/winpty"
+      - "/usr/local/sbin/winpty"
+      - "/usr/local/bin/winpty"
+      - "/usr/bin/winpty"
+      - "/usr/bin/site_perl/winpty"
+      - "/usr/bin/vendor_perl/winpty"
+      - "/usr/bin/core_perl/winpty"
+    found: false
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/compiler/gcc/generic.cmake:5 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindHostTools.cmake:125 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/dts.cmake:9 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_C_COMPILER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/aarch64-zephyr-elf/bin/aarch64-zephyr-elf-gcc"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/aarch64-zephyr-elf/bin/aarch64-zephyr-elf-gcc"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/compiler/gcc/generic.cmake:6 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindHostTools.cmake:125 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/dts.cmake:9 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_GCOV"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/aarch64-zephyr-elf/bin/aarch64-zephyr-elf-gcov"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/aarch64-zephyr-elf/bin/aarch64-zephyr-elf-gcov"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindDtc.cmake:19 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/dts.cmake:10 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:129 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "DTC"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "dtc"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/dtc"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/dtc"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/dtc"
+      - "/home/gabo/.venvs/zephyr/bin/dtc"
+      - "/home/gabo/.bun/bin/dtc"
+      - "/home/gabo/.local/bin/dtc"
+      - "/home/gabo/.opencode/bin/dtc"
+      - "/usr/local/sbin/dtc"
+      - "/usr/local/bin/dtc"
+    found: "/usr/bin/dtc"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/compiler/gcc/target.cmake:8 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:103 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_C_COMPILER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/compiler/gcc/target.cmake:26 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:103 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-g++"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-g++"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:5 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_OBJCOPY"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-objcopy"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-objcopy"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:6 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_OBJDUMP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-objdump"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-objdump"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:7 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_AS"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-as"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-as"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:12 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_AR"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-ar"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-ar"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:13 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_RANLIB"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-ranlib"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-ranlib"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:15 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_READELF"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-readelf"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-readelf"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:16 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_NM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-nm"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-nm"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:17 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_STRIP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-strip"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-strip"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:19 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_GDB"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb-py"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb-py"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/bintools/gnu/target.cmake:31 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/FindTargetTools.cmake:106 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:25 (find_package)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_GDB_NO_PY"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_UNAME"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "uname"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/uname"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/uname"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/uname"
+      - "/home/gabo/.venvs/zephyr/bin/uname"
+      - "/home/gabo/.bun/bin/uname"
+      - "/home/gabo/.local/bin/uname"
+      - "/home/gabo/.opencode/bin/uname"
+      - "/usr/local/sbin/uname"
+      - "/usr/local/bin/uname"
+    found: "/usr/bin/uname"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:213 (message)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    message: |
+      The target system is: Generic - 4.4.1 - arm
+      The host system is: Linux - 7.2.0-1-cachyos - x86_64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeNinjaFindMake.cmake:5 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_MAKE_PROGRAM"
+    description: "Program used to build from build.ninja files."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ninja-build"
+      - "ninja"
+      - "samu"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/ninja-build"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/ninja"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/samu"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/ninja-build"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/ninja"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/samu"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/ninja-build"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/ninja"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/samu"
+      - "/home/gabo/.venvs/zephyr/bin/ninja-build"
+      - "/home/gabo/.venvs/zephyr/bin/ninja"
+      - "/home/gabo/.venvs/zephyr/bin/samu"
+      - "/home/gabo/.bun/bin/ninja-build"
+      - "/home/gabo/.bun/bin/ninja"
+      - "/home/gabo/.bun/bin/samu"
+      - "/home/gabo/.local/bin/ninja-build"
+      - "/home/gabo/.local/bin/ninja"
+      - "/home/gabo/.local/bin/samu"
+      - "/home/gabo/.opencode/bin/ninja-build"
+      - "/home/gabo/.opencode/bin/ninja"
+      - "/home/gabo/.opencode/bin/samu"
+      - "/usr/local/sbin/ninja-build"
+      - "/usr/local/sbin/ninja"
+      - "/usr/local/sbin/samu"
+      - "/usr/local/bin/ninja-build"
+      - "/usr/local/bin/ninja"
+      - "/usr/local/bin/samu"
+      - "/usr/bin/ninja-build"
+    found: "/usr/bin/ninja"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:501 (find_file)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:538 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCCompilerId.c.in"
+    candidate_directories:
+      - "/usr/share/cmake/Modules/"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/"
+    found: "/usr/share/cmake/Modules/CMakeCCompilerId.c.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: /home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+      
+      The C compiler identification is GNU, found in:
+        /home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/4.4.2/CompilerIdC/a.out
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_DLLTOOL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "arm-zephyr-eabi-dlltool"
+      - "dlltool"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-dlltool"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-dlltool"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-dlltool"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-dlltool"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-dlltool"
+      - "/usr/local/sbin/arm-zephyr-eabi-dlltool"
+      - "/usr/local/bin/arm-zephyr-eabi-dlltool"
+      - "/usr/bin/arm-zephyr-eabi-dlltool"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-dlltool"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-dlltool"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-dlltool"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/dlltool"
+      - "/home/gabo/.venvs/zephyr/bin/dlltool"
+      - "/home/gabo/.bun/bin/dlltool"
+      - "/home/gabo/.local/bin/dlltool"
+      - "/home/gabo/.opencode/bin/dlltool"
+      - "/usr/local/sbin/dlltool"
+      - "/usr/local/bin/dlltool"
+      - "/usr/bin/dlltool"
+      - "/usr/bin/site_perl/dlltool"
+      - "/usr/bin/vendor_perl/dlltool"
+      - "/usr/bin/core_perl/dlltool"
+    found: false
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_ADDR2LINE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "arm-zephyr-eabi-addr2line"
+      - "addr2line"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-addr2line"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_TAPI"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "arm-zephyr-eabi-tapi"
+      - "tapi"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-tapi"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-tapi"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-tapi"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-tapi"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-tapi"
+      - "/usr/local/sbin/arm-zephyr-eabi-tapi"
+      - "/usr/local/bin/arm-zephyr-eabi-tapi"
+      - "/usr/bin/arm-zephyr-eabi-tapi"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-tapi"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-tapi"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-tapi"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/tapi"
+      - "/home/gabo/.venvs/zephyr/bin/tapi"
+      - "/home/gabo/.bun/bin/tapi"
+      - "/home/gabo/.local/bin/tapi"
+      - "/home/gabo/.opencode/bin/tapi"
+      - "/usr/local/sbin/tapi"
+      - "/usr/local/bin/tapi"
+      - "/usr/bin/tapi"
+      - "/usr/bin/site_perl/tapi"
+      - "/usr/bin/vendor_perl/tapi"
+      - "/usr/bin/core_perl/tapi"
+    found: false
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake:18 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake:201 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_C_COMPILER_AR"
+    description: "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "arm-zephyr-eabi-gcc-ar-14.3"
+      - "arm-zephyr-eabi-gcc-ar-14"
+      - "arm-zephyr-eabi-gcc-ar14"
+      - "arm-zephyr-eabi-gcc-ar"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ar14"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake:30 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake:201 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_C_COMPILER_RANLIB"
+    description: "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "arm-zephyr-eabi-gcc-ranlib-14"
+      - "arm-zephyr-eabi-gcc-ranlib14"
+      - "arm-zephyr-eabi-gcc-ranlib"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ranlib14"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:501 (find_file)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:538 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "/usr/share/cmake/Modules/"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/"
+    found: "/usr/share/cmake/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: /home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-g++ 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+      
+      The CXX compiler identification is GNU, found in:
+        /home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/4.4.2/CompilerIdCXX/a.out
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake:18 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:207 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER_AR"
+    description: "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "arm-zephyr-eabi-gcc-ar-14.3"
+      - "arm-zephyr-eabi-gcc-ar-14"
+      - "arm-zephyr-eabi-gcc-ar14"
+      - "arm-zephyr-eabi-gcc-ar"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ar-14.3"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ar-14"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ar-14"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ar14"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ar14"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake:30 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:207 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:129 (project)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER_RANLIB"
+    description: "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "arm-zephyr-eabi-gcc-ranlib-14"
+      - "arm-zephyr-eabi-gcc-ranlib14"
+      - "arm-zephyr-eabi-gcc-ranlib"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ranlib-14.3"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ranlib-14"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ranlib14"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ranlib14"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompiler.cmake:54 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineASMCompiler.cmake:61 (_cmake_find_compiler)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:135 (enable_language)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_ASM_COMPILER"
+    description: "ASM compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PROGRAM_PATH:
+        - "/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:1328 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineASMCompiler.cmake:174 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:135 (enable_language)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    message: |
+      Checking whether the ASM compiler is GNU using "--version" matched "(GNU assembler)|(GCC)|(Free Software Foundation)":
+      arm-zephyr-eabi-gcc (Zephyr SDK 1.0.1) 14.3.0
+      Copyright (C) 2024 Free Software Foundation, Inc.
+      This is free software; see the source for copying conditions.  There is NO
+      warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake:18 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineASMCompiler.cmake:271 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:135 (enable_language)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_ASM_COMPILER_AR"
+    description: "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "arm-zephyr-eabi-gcc-ar-"
+      - "arm-zephyr-eabi-gcc-ar-"
+      - "arm-zephyr-eabi-gcc-ar"
+      - "arm-zephyr-eabi-gcc-ar"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ar-"
+      - "/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ar-"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ar-"
+      - "/bin/arm-zephyr-eabi-gcc-ar-"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ar"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PROGRAM_PATH:
+        - "/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake:30 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineASMCompiler.cmake:271 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/kernel.cmake:135 (enable_language)"
+      - "/home/gabo/zephyr-ws/zephyr/cmake/modules/zephyr_default.cmake:138 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:66 (include)"
+      - "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake:92 (include_boilerplate)"
+      - "CMakeLists.txt:6 (find_package)"
+    mode: "program"
+    variable: "CMAKE_ASM_COMPILER_RANLIB"
+    description: "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "arm-zephyr-eabi-gcc-ranlib-"
+      - "arm-zephyr-eabi-gcc-ranlib-"
+      - "arm-zephyr-eabi-gcc-ranlib"
+      - "arm-zephyr-eabi-gcc-ranlib"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ranlib-"
+      - "/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/home/gabo/.venvs/zephyr/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/home/gabo/.bun/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/home/gabo/.local/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/home/gabo/.opencode/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/local/sbin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/local/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/bin/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/bin/site_perl/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/bin/vendor_perl/arm-zephyr-eabi-gcc-ranlib-"
+      - "/usr/bin/core_perl/arm-zephyr-eabi-gcc-ranlib-"
+      - "/bin/arm-zephyr-eabi-gcc-ranlib-"
+    found: "/home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc-ranlib"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PROGRAM_PATH:
+        - "/bin"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckIncludeFiles.cmake:184 (try_compile)"
+      - "/home/gabo/zephyr-ws/modules/hal/libmetal/libmetal/cmake/depends.cmake:33 (check_include_files)"
+      - "/home/gabo/zephyr-ws/modules/hal/libmetal/libmetal/CMakeLists.txt:17 (include)"
+    checks:
+      - "Looking for include file stdatomic.h"
+    directories:
+      source: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/CMakeScratch/TryCompile-FMtPZG"
+      binary: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/CMakeScratch/TryCompile-FMtPZG"
+    cmakeVariables:
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/gabo/zephyr-ws/zephyr/cmake/modules;/home/gabo/zephyr-ws/modules/hal/libmetal/libmetal/cmake;/home/gabo/zephyr-ws/modules/hal/libmetal/libmetal/cmake/modules;/home/gabo/zephyr-ws/modules/hal/libmetal/libmetal/cmake/platforms"
+    buildResult:
+      variable: "HAVE_STDATOMIC_H"
+      cached: true
+      stdout: |
+        Change Dir: '/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/CMakeScratch/TryCompile-FMtPZG'
+        
+        Run Build Command(s): /usr/bin/ninja -v cmTC_9f1ca
+        [1/2] /home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc   -c -o CMakeFiles/cmTC_9f1ca.dir/HAVE_STDATOMIC_H.c.obj -c /home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/CMakeScratch/TryCompile-FMtPZG/HAVE_STDATOMIC_H.c
+        [2/2] : && /home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc -c  CMakeFiles/cmTC_9f1ca.dir/HAVE_STDATOMIC_H.c.obj -o cmTC_9f1ca   && :
+        arm-zephyr-eabi-gcc: warning: CMakeFiles/cmTC_9f1ca.dir/HAVE_STDATOMIC_H.c.obj: linker input file unused because linking not done
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckIncludeFiles.cmake:184 (try_compile)"
+      - "/home/gabo/zephyr-ws/modules/lib/open-amp/open-amp/cmake/depends.cmake:19 (check_include_files)"
+      - "/home/gabo/zephyr-ws/modules/lib/open-amp/open-amp/CMakeLists.txt:18 (include)"
+    checks:
+      - "Looking for include file fcntl.h"
+    directories:
+      source: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/CMakeScratch/TryCompile-NVzdI2"
+      binary: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/CMakeScratch/TryCompile-NVzdI2"
+    cmakeVariables:
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: " -Wall -Wextra"
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/gabo/zephyr-ws/zephyr/cmake/modules;/home/gabo/zephyr-ws/modules/lib/open-amp/open-amp/cmake;/home/gabo/zephyr-ws/modules/lib/open-amp/open-amp/cmake/modules;/home/gabo/zephyr-ws/modules/lib/open-amp/open-amp/cmake/platforms"
+    buildResult:
+      variable: "HAVE_FCNTL_H"
+      cached: true
+      stdout: |
+        Change Dir: '/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/CMakeScratch/TryCompile-NVzdI2'
+        
+        Run Build Command(s): /usr/bin/ninja -v cmTC_96026
+        [1/2] /home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc   -Wall -Wextra -c -o CMakeFiles/cmTC_96026.dir/HAVE_FCNTL_H.c.obj -c /home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/CMakeScratch/TryCompile-NVzdI2/HAVE_FCNTL_H.c
+        [2/2] : && /home/gabo/zephyr-sdk-1.0.1/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc -Wall -Wextra -c  CMakeFiles/cmTC_96026.dir/HAVE_FCNTL_H.c.obj -o cmTC_96026   && :
+        arm-zephyr-eabi-gcc: warning: CMakeFiles/cmTC_96026.dir/HAVE_FCNTL_H.c.obj: linker input file unused because linking not done
+        
+      exitCode: 0
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/modules/lib/picolibc/CMakeLists.txt:49 (find_program)"
+    mode: "program"
+    variable: "CCACHE_PROGRAM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ccache"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/ccache"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/ccache"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/ccache"
+      - "/home/gabo/.venvs/zephyr/bin/ccache"
+      - "/home/gabo/.bun/bin/ccache"
+      - "/home/gabo/.local/bin/ccache"
+      - "/home/gabo/.opencode/bin/ccache"
+      - "/usr/local/sbin/ccache"
+      - "/usr/local/bin/ccache"
+    found: "/usr/bin/ccache"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PROGRAM_PATH:
+        - "/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/kobj.cmake:3 (find_program)"
+      - "/home/gabo/zephyr-ws/zephyr/CMakeLists.txt:985 (include)"
+    mode: "program"
+    variable: "GEN_KOBJECT_LIST"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gen_kobject_list"
+      - "gen_kobject_list.py"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/home/gabo/zephyr-ws/zephyr/scripts/build/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/gen_kobject_list"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/gen_kobject_list"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/gen_kobject_list"
+      - "/home/gabo/.venvs/zephyr/bin/gen_kobject_list"
+      - "/home/gabo/.bun/bin/gen_kobject_list"
+      - "/home/gabo/.local/bin/gen_kobject_list"
+      - "/home/gabo/.opencode/bin/gen_kobject_list"
+      - "/usr/local/sbin/gen_kobject_list"
+      - "/usr/local/bin/gen_kobject_list"
+      - "/usr/bin/gen_kobject_list"
+      - "/usr/bin/site_perl/gen_kobject_list"
+      - "/usr/bin/vendor_perl/gen_kobject_list"
+      - "/usr/bin/core_perl/gen_kobject_list"
+      - "/bin/gen_kobject_list"
+      - "/home/gabo/zephyr-ws/zephyr/scripts/build/gen_kobject_list"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/gen_kobject_list.py"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/gen_kobject_list.py"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/gen_kobject_list.py"
+      - "/home/gabo/.venvs/zephyr/bin/gen_kobject_list.py"
+      - "/home/gabo/.bun/bin/gen_kobject_list.py"
+      - "/home/gabo/.local/bin/gen_kobject_list.py"
+      - "/home/gabo/.opencode/bin/gen_kobject_list.py"
+      - "/usr/local/sbin/gen_kobject_list.py"
+      - "/usr/local/bin/gen_kobject_list.py"
+      - "/usr/bin/gen_kobject_list.py"
+      - "/usr/bin/site_perl/gen_kobject_list.py"
+      - "/usr/bin/vendor_perl/gen_kobject_list.py"
+      - "/usr/bin/core_perl/gen_kobject_list.py"
+      - "/bin/gen_kobject_list.py"
+    found: "/home/gabo/zephyr-ws/zephyr/scripts/build/gen_kobject_list.py"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PROGRAM_PATH:
+        - "/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/reports/CMakeLists.txt:115 (find_program)"
+    mode: "program"
+    variable: "PUNCOVER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "puncover"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/puncover"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/puncover"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/puncover"
+      - "/home/gabo/.venvs/zephyr/bin/puncover"
+      - "/home/gabo/.bun/bin/puncover"
+      - "/home/gabo/.local/bin/puncover"
+      - "/home/gabo/.opencode/bin/puncover"
+      - "/usr/local/sbin/puncover"
+      - "/usr/local/bin/puncover"
+      - "/usr/bin/puncover"
+      - "/usr/bin/site_perl/puncover"
+      - "/usr/bin/vendor_perl/puncover"
+      - "/usr/bin/core_perl/puncover"
+      - "/bin/puncover"
+    found: false
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PROGRAM_PATH:
+        - "/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/home/gabo/zephyr-ws/zephyr/cmake/reports/CMakeLists.txt:142 (find_program)"
+    mode: "program"
+    variable: "PAHOLE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "pahole"
+    candidate_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/"
+      - "/home/gabo/.venvs/zephyr/bin/"
+      - "/home/gabo/.bun/bin/"
+      - "/home/gabo/.local/bin/"
+      - "/home/gabo/.opencode/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+    searched_directories:
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/bin/pahole"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/sbin/pahole"
+      - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr/pahole"
+      - "/home/gabo/.venvs/zephyr/bin/pahole"
+      - "/home/gabo/.bun/bin/pahole"
+      - "/home/gabo/.local/bin/pahole"
+      - "/home/gabo/.opencode/bin/pahole"
+      - "/usr/local/sbin/pahole"
+      - "/usr/local/bin/pahole"
+    found: "/usr/bin/pahole"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PROGRAM_PATH:
+        - "/bin"
+  -
+    kind: "find_package-v1"
+    backtrace:
+      - "CMakeLists.txt:6 (find_package)"
+    name: "Zephyr"
+    configs:
+      -
+        filename: "Zephyr.cps"
+        kind: "cps"
+      -
+        filename: "zephyr.cps"
+        kind: "cps"
+      -
+        filename: "ZephyrConfig.cmake"
+        kind: "cmake"
+      -
+        filename: "zephyr-config.cmake"
+        kind: "cmake"
+    version_request:
+      exact: false
+    settings:
+      required: "required_explicit"
+      quiet: false
+      global: false
+      policy_scope: true
+      bypass_provider: false
+      hints:
+        - "/home/gabo/zephyr-ws/zephyr"
+      names:
+        - "Zephyr"
+      path_suffixes:
+        - ""
+      paths:
+        CMAKE_FIND_USE_CMAKE_PATH: true
+        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+        CMAKE_FIND_USE_INSTALL_PREFIX: true
+        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
+        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: true
+        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: true
+        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
+    candidates:
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/ZephyrConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/zephyr-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/lib/cps/Zephyr.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/lib/cps/zephyr.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/share/cps/Zephyr.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/gigaspark_os/build/gigaspark_m4/CMakeFiles/pkgRedirects/share/cps/zephyr.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/ZephyrConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/zephyr-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/cmake/ZephyrConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/cmake/zephyr-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/lib/cps/Zephyr.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/lib/cps/zephyr.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/cps/Zephyr.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/cps/zephyr.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/zephyrunittest-package/ZephyrConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/zephyrunittest-package/zephyr-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/ZephyrConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/zephyr-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/zephyrunittest-package/cmake/ZephyrConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/home/gabo/zephyr-ws/zephyr/share/zephyrunittest-package/cmake/zephyr-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+    found:
+      path: "/home/gabo/zephyr-ws/zephyr/share/zephyr-package/cmake/ZephyrConfig.cmake"
+      mode: "config"
+      version: "4.4.1"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "/home/gabo/zephyr-sdk-1.0.1/hosttools/sysroots/x86_64-pokysdk-linux/usr"
+      ENV{PATH}:
+        - "/home/gabo/.venvs/zephyr/bin"
+        - "/home/gabo/.bun/bin"
+        - "/home/gabo/.local/bin"
+        - "/home/gabo/.opencode/bin"
+        - "/home/gabo/.bun/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+...

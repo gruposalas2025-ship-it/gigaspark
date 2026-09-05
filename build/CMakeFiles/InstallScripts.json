@@ -1,0 +1,14 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/gabo/gigaspark_os/build/cmake_install.cmake",
+		"/home/gabo/gigaspark_os/build/_sysbuild/cmake_install.cmake",
+		"/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/cmake_install.cmake",
+		"/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/bootloader/cmake_install.cmake",
+		"/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/firmware_loader/cmake_install.cmake",
+		"/home/gabo/gigaspark_os/build/modules/mcuboot/cmake_install.cmake",
+		"/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/boards/cmake_install.cmake",
+		"/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/soc/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

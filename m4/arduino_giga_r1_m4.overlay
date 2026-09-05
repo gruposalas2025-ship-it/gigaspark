@@ -16,17 +16,17 @@
 		zephyr,memory-region = "SRAM4_IPC";
 		zephyr,memory-attr = <DT_MEM_ARM(ATTR_MPU_RAM)>;
 	};
-};
 
-/* IPC node for OpenAMP static vrings */
-ipc {
-	ipc0: ipc0 {
-		compatible = "zephyr,ipc-openamp-static-vrings";
-		memory-region = <&sram4_ipc>;
-		mboxes = <&mailbox 1>, <&mailbox 0>;
-		mbox-names = "tx", "rx";
-		role = "remote";
-		zephyr,buffer-size = <1024>;
-		status = "okay";
+	/* IPC node for OpenAMP static vrings */
+	ipc {
+		ipc0: ipc0 {
+			compatible = "zephyr,ipc-openamp-static-vrings";
+			memory-region = <&sram4_ipc>;
+			mboxes = <&mailbox 1>, <&mailbox 0>;
+			mbox-names = "tx", "rx";
+			role = "remote";
+			zephyr,buffer-size = <1024>;
+			status = "okay";
+		};
 	};
 };

@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/CMakeFiles/gigaspark_os"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/CMakeFiles/gigaspark_os.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/CMakeFiles/gigaspark_os-complete.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/gigaspark_os-prefix/src/gigaspark_os-stamp/gigaspark_os-build.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/gigaspark_os-prefix/src/gigaspark_os-stamp/gigaspark_os-configure.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/gigaspark_os-prefix/src/gigaspark_os-stamp/gigaspark_os-download.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/gigaspark_os-prefix/src/gigaspark_os-stamp/gigaspark_os-install.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/gigaspark_os-prefix/src/gigaspark_os-stamp/gigaspark_os-mkdir.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/gigaspark_os-prefix/src/gigaspark_os-stamp/gigaspark_os-patch.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/sysbuild/images/gigaspark_os-prefix/src/gigaspark_os-stamp/gigaspark_os-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"gigaspark_os"
+		],
+		"name" : "gigaspark_os"
+	}
+}

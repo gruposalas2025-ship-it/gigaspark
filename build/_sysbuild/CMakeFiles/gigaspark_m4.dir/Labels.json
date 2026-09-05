@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/CMakeFiles/gigaspark_m4"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/CMakeFiles/gigaspark_m4.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/CMakeFiles/gigaspark_m4-complete.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/gigaspark_m4-prefix/src/gigaspark_m4-stamp/gigaspark_m4-build.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/gigaspark_m4-prefix/src/gigaspark_m4-stamp/gigaspark_m4-configure.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/gigaspark_m4-prefix/src/gigaspark_m4-stamp/gigaspark_m4-download.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/gigaspark_m4-prefix/src/gigaspark_m4-stamp/gigaspark_m4-install.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/gigaspark_m4-prefix/src/gigaspark_m4-stamp/gigaspark_m4-mkdir.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/gigaspark_m4-prefix/src/gigaspark_m4-stamp/gigaspark_m4-patch.rule"
+		},
+		{
+			"file" : "/home/gabo/gigaspark_os/build/_sysbuild/gigaspark_m4-prefix/src/gigaspark_m4-stamp/gigaspark_m4-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"gigaspark_m4"
+		],
+		"name" : "gigaspark_m4"
+	}
+}

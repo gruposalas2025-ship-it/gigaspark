@@ -1,0 +1,2 @@
+# Load Sysbuild board Kconfig descriptions.
+osource "/home/gabo/zephyr-ws/zephyr/boards/arduino/giga_r1/Kconfig.sysbuild"

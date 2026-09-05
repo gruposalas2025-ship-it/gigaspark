@@ -1,0 +1,1 @@
+"mcuboot":"/home/gabo/zephyr-ws/bootloader/mcuboot":"/home/gabo/zephyr-ws/bootloader/mcuboot/boot/zephyr/sysbuild"

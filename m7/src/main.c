@@ -15,6 +15,9 @@
 
 #include "ipc_config.h"
 
+/* Green LED = PJ13 (alias led1) */
+static const struct gpio_dt_spec led_green = GPIO_DT_SPEC_GET(DT_ALIAS(led1), gpios);
+
 static K_SEM_DEFINE(bound_sem, 0, 1);
 static K_SEM_DEFINE(data_sem, 0, 1);
 
@@ -51,21 +54,18 @@ static struct ipc_ept_cfg ept_cfg = {
 int main(void)
 {
 	const struct device *ipc_instance;
-	const struct device *gpio_dev;
 	struct ipc_ept ept;
 	int ret;
 
 	printk("[M7] Gigaspark OS Primary Core starting...\n");
 
-	/* --- Initialize GPIO for green LED (led1 = PJ13) --- */
-	gpio_dev = DEVICE_DT_GET(DT_ALIAS(led1));
-	if (!device_is_ready(gpio_dev)) {
+	/* --- Initialize GPIO for green LED --- */
+	if (!gpio_is_ready_dt(&led_green)) {
 		printk("[M7] GPIO device not ready\n");
 		return -ENODEV;
 	}
 
-	ret = gpio_pin_configure_dt(gpio_pin_dt_spec_get(DT_ALIAS(led1)),
-				    GPIO_OUTPUT_INACTIVE);
+	ret = gpio_pin_configure_dt(&led_green, GPIO_OUTPUT_INACTIVE);
 	if (ret < 0) {
 		printk("[M7] Failed to configure LED: %d\n", ret);
 		return ret;
@@ -108,7 +108,7 @@ int main(void)
 		printk("[M7] M4 handshake OK!\n");
 
 		/* Turn ON green LED */
-		gpio_pin_set_dt(gpio_pin_dt_spec_get(DT_ALIAS(led1)), 1);
+		gpio_pin_set_dt(&led_green, 1);
 
 		printk("[M7] ========================================\n");
 		printk("[M7]  GIGASPARK OS BASE SYSTEM READY\n");

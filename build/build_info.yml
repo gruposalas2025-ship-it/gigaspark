@@ -1,0 +1,27 @@
+cmake:
+  application:
+    source-dir: '/home/gabo/zephyr-ws/zephyr/share/sysbuild'
+  board:
+    name: 'arduino_giga_r1'
+    path:
+     - '/home/gabo/zephyr-ws/zephyr/boards/arduino/giga_r1'
+    qualifiers: 'stm32h747xx/m7'
+    revision: ''
+  images:
+   - name: 'gigaspark_os'
+     source-dir: '/home/gabo/gigaspark_os'
+     type: 'MAIN'
+   - name: 'gigaspark_m4'
+     source-dir: ''
+  kconfig:
+    files:
+     - '/home/gabo/gigaspark_os/build/_sysbuild/empty.conf'
+     - '/home/gabo/gigaspark_os/build/_sysbuild/empty.conf'
+    user-files:
+     - '/home/gabo/gigaspark_os/build/_sysbuild/empty.conf'
+  sysbuild: 'true'
+version: '0.1.0'
+west:
+  command: '/home/gabo/.venvs/zephyr/bin/west build -p -b arduino_giga_r1/stm32h747xx/m7 --sysbuild .'
+  topdir: '/home/gabo/zephyr-ws'
+  version: '1.5.0'

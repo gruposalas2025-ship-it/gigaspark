@@ -1,0 +1,2 @@
+# Load Zephyr board defconfig descriptions.
+osource "/home/gabo/zephyr-ws/zephyr/boards/arduino/giga_r1/Kconfig.defconfig"
