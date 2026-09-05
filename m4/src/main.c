@@ -2,9 +2,12 @@
  * Gigaspark OS - M4 Remote Core
  * STM32H747XI Cortex-M4 @ 240MHz
  *
- * Phase 3: Memory engine with zRAM compression.
- * Receives CMD_ALLOC/CMD_FREE/CMD_READ from M7 via IPC.
- * Manages a static 4KB pool with automatic RLE compression.
+ * Phase 4: 3-tier memory engine with SD swap.
+ * Tier 1: 4KB main pool (live data)
+ * Tier 2: 2KB compressed pool (RLE blobs)
+ * Tier 3: SD card sectors (evicted compressed blobs)
+ *
+ * Receives CMD_ALLOC/CMD_FREE/CMD_READ/CMD_WRITE from M7 via IPC.
  * Returns opaque handles, never exposes real addresses to M7.
  */
 
@@ -26,7 +29,7 @@ static struct ipc_ept ept;
 static volatile bool ept_ready;
 
 /* Buffer for CMD_READ responses */
-static uint8_t read_buf[MEM_READ_MAX];
+static uint8_t read_buf[MEM_IO_MAX];
 
 /* Process an incoming IPC command and prepare the response */
 static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
@@ -59,8 +62,8 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 	}
 	case CMD_READ: {
 		size_t to_read = req->size;
-		if (to_read > MEM_READ_MAX) {
-			to_read = MEM_READ_MAX;
+		if (to_read > MEM_IO_MAX) {
+			to_read = MEM_IO_MAX;
 		}
 
 		size_t actual = mem_read(req->handle, read_buf, to_read);
@@ -76,6 +79,23 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 
 		LOG_INF("CMD_READ handle=0x%04x size=%u -> actual=%u status=%d",
 			req->handle, to_read, actual, resp->status);
+		break;
+	}
+	case CMD_WRITE: {
+		/*
+		 * For Phase 4, CMD_WRITE uses the size field to carry
+		 * a simple pattern byte that the M4 uses to fill the block.
+		 * The actual data payload is not sent via IPC to keep
+		 * the message fixed-size.
+		 */
+		int ret = mem_write(req->handle, &req->size, sizeof(req->size));
+
+		resp->status = (ret == 0) ? STATUS_OK : STATUS_ERR_WRITE_FAILED;
+		resp->handle = req->handle;
+		resp->size = 0;
+
+		LOG_INF("CMD_WRITE handle=0x%04x -> status=%d",
+			req->handle, resp->status);
 		break;
 	}
 	default:
@@ -131,7 +151,7 @@ int main(void)
 
 	LOG_INF("Gigaspark OS M4 Remote Core starting...");
 
-	/* Initialize memory engine with compression */
+	/* Initialize memory engine (includes SD swap init) */
 	mem_init();
 
 	/* Initialize IPC */
@@ -151,7 +171,7 @@ int main(void)
 
 	LOG_INF("Waiting for M7 handshake...");
 	k_sem_take(&bound_sem, K_FOREVER);
-	LOG_INF("M4 memory engine (zRAM) ready. Waiting for commands...");
+	LOG_INF("M4 3-tier memory engine ready. Waiting for commands...");
 
 	/* Wait forever - commands are processed in ept_received callback */
 	while (1) {

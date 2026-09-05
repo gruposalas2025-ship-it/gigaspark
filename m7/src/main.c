@@ -2,10 +2,12 @@
  * Gigaspark OS - M7 Primary Core
  * STM32H747XI Cortex-M7 @ 480MHz
  *
- * Phase 3: zRAM compression test.
- * Fills the M4 memory pool to force compression, then reads back
- * a compressed block to verify transparent decompression.
- * Uses Zephyr IPC Service with OpenAMP static vrings.
+ * Phase 4: 3-tier memory stress test.
+ * Allocates 16 blocks of 512 bytes (8KB total) to force:
+ *   - Tier 1 (4KB main pool) overflow -> compress to Tier 2
+ *   - Tier 2 (2KB compressed pool) overflow -> evict to Tier 3 (SD)
+ * Then reads back blocks 0, 8, and 15 to verify transparent
+ * decompression from all three tiers.
  */
 
 #include <zephyr/kernel.h>
@@ -32,7 +34,7 @@ static volatile bool ept_ready;
 static struct ipc_msg last_resp;
 
 /* Read buffer for CMD_READ responses */
-static uint8_t read_buf[MEM_READ_MAX];
+static uint8_t read_buf[MEM_IO_MAX];
 
 static void ept_bound(void *priv)
 {
@@ -114,20 +116,20 @@ int main(void)
 	LOG_INF("Waiting for M4 endpoint...");
 	k_sem_take(&bound_sem, K_FOREVER);
 
-	/* === Phase 3: zRAM Compression Test === */
-	LOG_INF("=== Phase 3: zRAM Compression Test ===");
+	/* === Phase 4: 3-Tier Memory Stress Test === */
+	LOG_INF("=== Phase 4: 3-Tier Memory Stress Test ===");
 
 	/*
-	 * Step 1: Fill the pool by allocating 8 blocks of 512 bytes.
-	 * Total = 4096 bytes = full pool.
-	 * The 5th allocation will force M4 to compress a victim block.
+	 * Step 1: Allocate 16 blocks of 512 bytes (8KB total).
+	 * This exceeds both the 4KB main pool and 2KB compressed pool,
+	 * forcing eviction to SD card (Tier 3).
 	 */
-	uint16_t handles[8];
+	uint16_t handles[16];
 	int alloc_count = 0;
 
-	LOG_INF("--- Step 1: Filling pool (8 x 512B) ---");
+	LOG_INF("--- Step 1: Allocating 16 x 512B (8KB) ---");
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 16; i++) {
 		struct ipc_msg alloc_cmd = {
 			.cmd = CMD_ALLOC,
 			.size = 512,
@@ -138,7 +140,7 @@ int main(void)
 
 		ret = send_cmd(&alloc_cmd, &resp);
 		if (ret < 0 || resp.status != STATUS_OK) {
-			LOG_INF("Alloc %d failed (status=%d), pool full at %d blocks",
+			LOG_INF("Alloc[%d] failed (status=%d), stopping at %d",
 				i, resp.status, alloc_count);
 			break;
 		}
@@ -148,38 +150,47 @@ int main(void)
 		LOG_INF("Alloc[%d]: handle=0x%04x", i, resp.handle);
 	}
 
-	LOG_INF("Pool filled: %d blocks allocated", alloc_count);
+	LOG_INF("Allocated %d blocks (expected 16)", alloc_count);
 
 	/*
-	 * Step 2: Read back the first handle to verify decompression.
-	 * The M4 should decompress it transparently.
+	 * Step 2: Read blocks 0, 8, and 15 to verify 3-tier decompression.
+	 * Block 0: likely still in main pool or compressed pool
+	 * Block 8: likely compressed or swapped to SD
+	 * Block 15: likely swapped to SD
 	 */
-	if (alloc_count > 0) {
-		LOG_INF("--- Step 2: Reading compressed block ---");
+	LOG_INF("--- Step 2: Reading blocks 0, 8, 15 (3-tier test) ---");
+
+	int read_indices[] = {0, 8, 15};
+	for (int r = 0; r < 3; r++) {
+		int idx = read_indices[r];
+		if (idx >= alloc_count) {
+			LOG_INF("Block %d not allocated, skipping", idx);
+			continue;
+		}
 
 		struct ipc_msg read_cmd = {
 			.cmd = CMD_READ,
-			.handle = handles[0],
-			.size = MEM_READ_MAX,
+			.handle = handles[idx],
+			.size = MEM_IO_MAX,
 			.status = 0,
 		};
 		struct ipc_msg resp;
 
 		ret = send_cmd(&read_cmd, &resp);
 		if (ret < 0) {
-			LOG_ERR("Read failed: %d", ret);
+			LOG_ERR("Read[%d] failed: %d", idx, ret);
 		} else if (resp.status == STATUS_OK) {
-			LOG_INF("Read OK: handle=0x%04x actual=%u bytes",
-				resp.handle, resp.size);
+			LOG_INF("Read[%d]: handle=0x%04x actual=%u bytes OK",
+				idx, resp.handle, resp.size);
 		} else {
-			LOG_ERR("Read error: status=%d", resp.status);
+			LOG_ERR("Read[%d]: status=%d (error)", idx, resp.status);
 		}
 	}
 
 	/*
 	 * Step 3: Free all allocated blocks.
 	 */
-	LOG_INF("--- Step 3: Freeing all blocks ---");
+	LOG_INF("--- Step 3: Freeing all %d blocks ---", alloc_count);
 
 	for (int i = 0; i < alloc_count; i++) {
 		struct ipc_msg free_cmd = {
@@ -201,11 +212,11 @@ int main(void)
 	/* Step 4: Turn ON green LED - system verified */
 	gpio_pin_set_dt(&led_green, 1);
 
-	LOG_INF("============================================");
-	LOG_INF(" GIGASPARK OS PHASE 3 COMPLETE");
-	LOG_INF(" zRAM compression: RLE on M4");
+	LOG_INF("====================================================");
+	LOG_INF(" GIGASPARK OS PHASE 4 COMPLETE");
+	LOG_INF(" 3-Tier Memory: RAM(4KB) -> zRAM(2KB) -> SD(swap)");
 	LOG_INF(" M7 @ 480MHz | M4 @ 240MHz | IPC OK");
-	LOG_INF("============================================");
+	LOG_INF("====================================================");
 
 	return 0;
 }

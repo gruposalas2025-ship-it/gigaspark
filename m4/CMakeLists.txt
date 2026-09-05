@@ -10,6 +10,7 @@ target_sources(app PRIVATE
 	src/main.c
 	src/mem_engine.c
 	src/zram_comp.c
+	src/sd_swap.c
 )
 target_include_directories(app PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}
