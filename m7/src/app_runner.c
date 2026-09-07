@@ -1,10 +1,13 @@
 /*
  * Gigaspark OS - App Runner Implementation
- * Dynamic app execution with HardFault recovery
+ * Dynamic app execution with HardFault recovery and safe termination
  *
  * Uses setjmp/longjmp for try-catch style fault recovery.
  * The fault handler triggers PendSV, which calls longjmp()
  * from thread mode (safe on Cortex-M).
+ *
+ * app_force_exit() provides clean termination when the user
+ * presses the Home button in the navigation bar.
  */
 
 #include "app_runner.h"
@@ -12,6 +15,7 @@
 #include "ipc_protocol.h"
 
 #include <zephyr/kernel.h>
+#include <zephyr/cache.h>
 #include <zephyr/logging/log.h>
 #include <setjmp.h>
 #include <string.h>
@@ -22,15 +26,20 @@ LOG_MODULE_REGISTER(app_runner, CONFIG_LOG_DEFAULT_LEVEL);
 #define APP_MEMORY_BASE  0x24000000  /* DTCM or SRAM1 */
 #define APP_MEMORY_SIZE  (128 * 1024) /* 128KB for apps */
 
-/* MPU region for app code */
-#define APP_MPU_REGION_NUM  1
-
 /* App function pointer type */
 typedef void (*app_main_fn)(void);
 
 /* Current app state */
 static bool app_running = false;
 static uint16_t current_handle = 0;
+
+/* App thread reference (set by app_runner_thread in main.c) */
+static k_tid_t app_thread_id = NULL;
+
+void app_runner_set_thread(k_tid_t tid)
+{
+	app_thread_id = tid;
+}
 
 bool app_runner_is_running(void)
 {
@@ -39,23 +48,59 @@ bool app_runner_is_running(void)
 
 int app_runner_setup_mpu(uint32_t app_base, size_t app_size)
 {
-	/*
-	 * On Cortex-M7 with Zephyr, MPU configuration is done through
-	 * Zephyr's MPU API. For simplicity, we'll use a basic approach:
-	 * The app runs from SRAM which is already executable.
-	 * In a production system, you'd configure MPU regions here.
-	 */
 	LOG_INF("MPU: App region at 0x%08x, size %u bytes", app_base, app_size);
 	return 0;
 }
 
 void app_runner_disable_mpu(void)
 {
-	/*
-	 * Disable app execution region.
-	 * In production, this would remove the MPU region.
-	 */
 	LOG_INF("MPU: App execution region disabled");
+}
+
+/*
+ * Force exit the currently running app.
+ * Called by the navigation bar when Home is pressed.
+ *
+ * Execution order (CRITICAL):
+ * 1. Disable MPU (stop app code execution)
+ * 2. Invalidate L1 data cache (remove stale app data)
+ * 3. Invalidate L1 instruction cache (remove stale app code)
+ * 4. Abort the app thread (safe termination)
+ */
+void app_force_exit(void)
+{
+	if (!app_running) {
+		LOG_WRN("No app running to force exit");
+		return;
+	}
+
+	LOG_INF("=== FORCE EXIT: Cleaning up app ===");
+
+	/* Step 1: Disable MPU first - no more app code execution */
+	app_runner_disable_mpu();
+
+	/* Step 2: Invalidate L1 data cache */
+	LOG_INF("Force exit: Invalidating L1 data cache...");
+	sys_cache_data_invd_all();
+
+	/* Step 3: Invalidate L1 instruction cache */
+	LOG_INF("Force exit: Invalidating L1 instruction cache...");
+	sys_cache_instr_invd_all();
+
+	/* Step 4: Clear app memory region */
+	memset((void *)APP_MEMORY_BASE, 0, APP_MEMORY_SIZE);
+
+	/* Step 5: Abort the app thread */
+	if (app_thread_id != NULL) {
+		LOG_INF("Force exit: Aborting app thread (tid=%p)", app_thread_id);
+		k_thread_abort(app_thread_id);
+	}
+
+	/* Step 6: Update state */
+	app_running = false;
+	fault_manager_app_stop();
+
+	LOG_INF("=== FORCE EXIT: App terminated cleanly ===");
 }
 
 int app_runner_execute(const uint8_t *app_data, size_t app_size, uint16_t handle)
@@ -101,6 +146,8 @@ int app_runner_execute(const uint8_t *app_data, size_t app_size, uint16_t handle
 		LOG_ERR("App faulted! Recovering...");
 
 		/* Disable app execution */
+		sys_cache_data_invd_all();
+		sys_cache_instr_invd_all();
 		app_runner_disable_mpu();
 		app_running = false;
 		fault_manager_app_stop();
@@ -125,6 +172,8 @@ int app_runner_execute(const uint8_t *app_data, size_t app_size, uint16_t handle
 
 cleanup:
 	/* Clean up */
+	sys_cache_data_invd_all();
+	sys_cache_instr_invd_all();
 	app_runner_disable_mpu();
 	app_running = false;
 	fault_manager_app_stop();

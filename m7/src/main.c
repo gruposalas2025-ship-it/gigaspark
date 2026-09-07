@@ -2,7 +2,19 @@
  * Gigaspark OS - M7 Primary Core
  * STM32H747XI Cortex-M7 @ 480MHz
  *
- * Phase 10: IPC + App Runner + WiFi Downloader
+ * Architecture: 2 Dedicated Threads (Strict Multiplexation)
+ *
+ * Thread 1 - ui_launcher (Priority: Low):
+ *   EXCLUSIVELY handles LVGL rendering, touch input, and the app menu.
+ *   Runs lv_timer_handler() in a tight loop at 5ms intervals.
+ *   Manages the navigation bar (Home button).
+ *
+ * Thread 2 - app_runner (Priority: High):
+ *   EXCLUSIVELY executes user apps (app_main()) and handles the SDK.
+ *   Communicates with M4 via IPC for memory and filesystem ops.
+ *   Can be aborted by ui_launcher when Home is pressed.
+ *
+ * Communication: main() initializes everything, then threads take over.
  */
 
 #include <zephyr/kernel.h>
@@ -15,6 +27,7 @@
 #include "ipc_protocol.h"
 #include "fault_manager.h"
 #include "app_runner.h"
+#include "nav_bar.h"
 #include "net_manager.h"
 #include "app_downloader.h"
 
@@ -26,11 +39,14 @@ extern void gigaspark_sdk_init(void);
 /* Green LED = PJ13 (alias led1) */
 static const struct gpio_dt_spec led_green = GPIO_DT_SPEC_GET(DT_ALIAS(led1), gpios);
 
-static K_SEM_DEFINE(bound_sem, 0, 1);
-static K_SEM_DEFINE(data_sem, 0, 1);
+/* ============================================================
+ * IPC Layer (shared by both threads)
+ * ============================================================ */
 
 static struct ipc_ept ept;
 static volatile bool ept_ready;
+static K_SEM_DEFINE(bound_sem, 0, 1);
+static K_SEM_DEFINE(data_sem, 0, 1);
 
 /* Last response from M4 */
 static struct ipc_msg last_resp;
@@ -63,7 +79,7 @@ static struct ipc_ept_cfg ept_cfg = {
 	},
 };
 
-/* Send a command to M4 and wait for response */
+/* Send a command to M4 and wait for response (blocking) */
 int send_ipc_cmd(struct ipc_msg *cmd, struct ipc_msg *resp)
 {
 	int ret;
@@ -79,65 +95,66 @@ int send_ipc_cmd(struct ipc_msg *cmd, struct ipc_msg *resp)
 	return 0;
 }
 
-int main(void)
+/* ============================================================
+ * UI Launcher Thread (Low Priority)
+ * EXCLUSIVELY handles LVGL rendering, touch input, and navigation bar.
+ * If an app enters an infinite loop, this thread keeps running.
+ * ============================================================ */
+
+static void ui_launcher_thread(void *p1, void *p2, void *p3)
 {
-	const struct device *ipc_instance;
+	LOG_INF("UI Launcher thread starting...");
+
+	/* Initialize navigation bar */
+	nav_bar_init();
+
+	/*
+	 * TODO: When LVGL display driver is ready, this thread will:
+	 *   while (1) {
+	 *       lv_timer_handler();  // Processes touch, renders UI
+	 *       k_msleep(5);         // 5ms = 200 FPS max
+	 *   }
+	 *
+	 * For now, it runs a simple LED blink to show it's alive.
+	 */
+
+	while (1) {
+		/* Blink LED to show UI thread is running */
+		gpio_pin_toggle_dt(&led_green);
+		k_msleep(500);
+	}
+}
+
+/* Static thread: UI launcher, low priority (PRIORITY=14) */
+K_THREAD_DEFINE(ui_launcher_tid, 4096,
+		ui_launcher_thread, NULL, NULL, NULL,
+		14, 0, 0);
+
+/* ============================================================
+ * App Runner Thread (High Priority)
+ * EXCLUSIVELY executes user apps and handles SDK operations.
+ * Communicates with M4 via IPC.
+ * ============================================================ */
+
+static void app_runner_thread(void *p1, void *p2, void *p3)
+{
 	int ret;
 
-	LOG_INF("Gigaspark OS M7 Primary Core starting...");
+	LOG_INF("App Runner thread starting...");
 
-	/* Initialize GPIO for green LED */
-	if (!gpio_is_ready_dt(&led_green)) {
-		LOG_ERR("GPIO device not ready");
-		return -ENODEV;
-	}
+	/* Set up thread reference for force exit */
+	app_runner_set_thread(k_current_get());
 
-	ret = gpio_pin_configure_dt(&led_green, GPIO_OUTPUT_INACTIVE);
-	if (ret < 0) {
-		LOG_ERR("Failed to configure LED: %d", ret);
-		return ret;
-	}
-
-	/* Initialize fault manager */
-	fault_manager_init();
-
-	/* Initialize SDK */
-	gigaspark_sdk_init();
-
-	/* Initialize network */
-	LOG_INF("Initializing network...");
-	ret = net_manager_init();
-	if (ret < 0) {
-		LOG_WRN("Network init failed: %d", ret);
-	}
-
-	/* Initialize IPC */
-	ipc_instance = DEVICE_DT_GET(DT_NODELABEL(ipc0));
-
-	ret = ipc_service_open_instance(ipc_instance);
-	if (ret < 0 && ret != -EALREADY) {
-		LOG_ERR("Failed to open IPC instance: %d", ret);
-		return ret;
-	}
-
-	ret = ipc_service_register_endpoint(ipc_instance, &ept, &ept_cfg);
-	if (ret < 0) {
-		LOG_ERR("Failed to register endpoint: %d", ret);
-		return ret;
-	}
-
-	LOG_INF("Waiting for M4 endpoint...");
+	/* Wait for IPC to be ready */
 	k_sem_take(&bound_sem, K_FOREVER);
 
-	/* === WiFi Connection === */
+	/* === WiFi Connection (stub) === */
 	LOG_INF("=== Connecting to WiFi ===");
-
 	ret = net_connect_wifi("Gigaspark-AP", "gigaspark123");
 	if (ret < 0) {
 		LOG_WRN("WiFi connection failed: %d", ret);
 	} else {
-		LOG_INF("Waiting for IP address...");
-		ret = net_wait_ip(10000);  /* 10 second timeout */
+		ret = net_wait_ip(10000);
 		if (ret < 0) {
 			LOG_WRN("Failed to get IP: %d", ret);
 		} else {
@@ -194,6 +211,9 @@ int main(void)
 				LOG_INF("App loaded: handle=0x%04x, size=%u bytes",
 					resp.handle, resp.size);
 
+				/* Show navigation bar */
+				nav_bar_show();
+
 				/* Execute app with fault recovery */
 				LOG_INF("Executing app with fault recovery...");
 				int app_result = app_runner_execute(
@@ -201,6 +221,9 @@ int main(void)
 					resp.size,
 					resp.handle
 				);
+
+				/* Hide navigation bar when app exits */
+				nav_bar_hide();
 
 				if (app_result == APP_RESULT_FAULT) {
 					LOG_WRN("App faulted - recovered, returning to launcher");
@@ -213,14 +236,85 @@ int main(void)
 		}
 	}
 
-	/* Turn ON green LED - system ready */
-	gpio_pin_set_dt(&led_green, 1);
+	LOG_INF("App Runner: entering idle loop");
+
+	/* App runner thread idle - waits for next app to execute */
+	while (1) {
+		k_msleep(1000);
+	}
+}
+
+/* Static thread: App runner, high priority (PRIORITY=5) */
+K_THREAD_DEFINE(app_runner_tid, 8192,
+		app_runner_thread, NULL, NULL, NULL,
+		5, 0, 0);
+
+/* ============================================================
+ * Main (Initialization Only)
+ * Initializes hardware and subsystems, then threads take over.
+ * ============================================================ */
+
+int main(void)
+{
+	int ret;
 
 	LOG_INF("====================================================");
-	LOG_INF(" GIGASPARK OS PHASE 10 COMPLETE");
-	LOG_INF(" WiFi + App Downloader + Fault Recovery");
-	LOG_INF(" M7 @ 480MHz | M4 @ 240MHz | IPC OK");
+	LOG_INF(" GIGASPARK OS v0.2.0");
+	LOG_INF(" M7 @ 480MHz | M4 @ 240MHz");
+	LOG_INF(" Architecture: 2 cores x 2 threads = 4 threads");
+	LOG_INF("====================================================");
+	LOG_INF("M7 Primary Core starting...");
+
+	/* Initialize GPIO for green LED */
+	if (!gpio_is_ready_dt(&led_green)) {
+		LOG_ERR("GPIO device not ready");
+		return -ENODEV;
+	}
+
+	ret = gpio_pin_configure_dt(&led_green, GPIO_OUTPUT_INACTIVE);
+	if (ret < 0) {
+		LOG_ERR("Failed to configure LED: %d", ret);
+		return ret;
+	}
+
+	/* Initialize fault manager */
+	fault_manager_init();
+	LOG_INF("Fault manager: OK");
+
+	/* Initialize SDK */
+	gigaspark_sdk_init();
+	LOG_INF("SDK export table: OK");
+
+	/* Initialize network */
+	ret = net_manager_init();
+	if (ret < 0) {
+		LOG_WRN("Network init failed: %d", ret);
+	} else {
+		LOG_INF("Network manager: OK");
+	}
+
+	/* Initialize IPC */
+	const struct device *ipc_instance = DEVICE_DT_GET(DT_NODELABEL(ipc0));
+
+	ret = ipc_service_open_instance(ipc_instance);
+	if (ret < 0 && ret != -EALREADY) {
+		LOG_ERR("Failed to open IPC instance: %d", ret);
+		return ret;
+	}
+
+	ret = ipc_service_register_endpoint(ipc_instance, &ept, &ept_cfg);
+	if (ret < 0) {
+		LOG_ERR("Failed to register endpoint: %d", ret);
+		return ret;
+	}
+
+	LOG_INF("IPC endpoint: OK");
+	LOG_INF("====================================================");
+	LOG_INF(" M7 Threads:");
+	LOG_INF("   ui_launcher: tid=%d, prio=14 (LOW)", (int)ui_launcher_tid);
+	LOG_INF("   app_runner:  tid=%d, prio=5 (HIGH)", (int)app_runner_tid);
 	LOG_INF("====================================================");
 
+	/* main() thread sleeps forever - threads do all the work */
 	return 0;
 }

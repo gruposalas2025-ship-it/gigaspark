@@ -2,9 +2,21 @@
  * Gigaspark OS - M4 Remote Core
  * STM32H747XI Cortex-M4 @ 240MHz
  *
- * Phase 10: File system manager + 3-tier memory engine + file write.
- * Serves app list, app binaries, and file operations to M7 via IPC.
- * Memory engine: RAM -> compressed_pool -> SD swap.
+ * Architecture: 2 Dedicated Threads (Strict Multiplexation)
+ *
+ * Thread 1 - ipc_listener (Priority: High):
+ *   EXCLUSIVELY receives RPMsg messages and queues commands.
+ *   EXCLUSIVELY sends responses back to M7.
+ *   Never processes commands directly.
+ *
+ * Thread 2 - mem_engine (Priority: Medium):
+ *   EXCLUSIVELY processes commands from the queue.
+ *   Runs all compression, decompression, SD swap, and filesystem ops.
+ *   Puts responses into resp_msgq for ipc_listener to send.
+ *
+ * Communication: k_msgq between ISR callback and mem_engine thread.
+ * If mem_engine is compressing a 1KB block, ipc_listener
+ * keeps receiving new commands without blocking.
  */
 
 #include <zephyr/kernel.h>
@@ -19,20 +31,133 @@
 
 LOG_MODULE_REGISTER(gigaspark_m4, CONFIG_LOG_DEFAULT_LEVEL);
 
-static K_SEM_DEFINE(bound_sem, 0, 1);
-static K_SEM_DEFINE(data_sem, 0, 1);
+/* ============================================================
+ * Shared State
+ * ============================================================ */
 
+#define CMD_QUEUE_SIZE  8
+
+/* Request item for the command queue */
+struct cmd_item {
+	struct ipc_msg req;
+};
+
+/* Message queues */
+K_MSGQ_DEFINE(cmd_msgq, sizeof(struct cmd_item), CMD_QUEUE_SIZE, 1);
+K_MSGQ_DEFINE(resp_msgq, sizeof(struct ipc_msg), CMD_QUEUE_SIZE, 1);
+
+/* Semaphores */
+static K_SEM_DEFINE(bound_sem, 0, 1);
+static K_SEM_DEFINE(cmd_sem, 0, CMD_QUEUE_SIZE);
+static K_SEM_DEFINE(resp_sem, 0, CMD_QUEUE_SIZE);
+
+/* IPC endpoint */
 static struct ipc_ept ept;
 static volatile bool ept_ready;
 
-/* Buffers for IPC responses */
+/* Buffers for IPC responses (owned by mem_engine thread) */
 static uint8_t io_buf[MEM_IO_MAX];
 static uint8_t app_buf[APP_BINARY_MAX_SIZE];
-
-/* Shared buffer for file write chunks from M7 */
 uint8_t g_file_write_buf[FILE_WRITE_CHUNK_MAX];
 
-/* Process an incoming IPC command and prepare the response */
+/* ============================================================
+ * IPC Callbacks (run in ISR context, must be FAST)
+ * ============================================================ */
+
+static void ept_bound(void *priv)
+{
+	ept_ready = true;
+	k_sem_give(&bound_sem);
+	LOG_INF("Endpoint bound to M7");
+}
+
+static void ept_received(const void *data, size_t len, void *priv)
+{
+	if (len < sizeof(struct ipc_msg)) {
+		return;
+	}
+
+	/* Copy the message into our queue item (safe from ISR) */
+	struct cmd_item item;
+	memcpy(&item.req, data, sizeof(struct ipc_msg));
+
+	/* Non-blocking put into the queue */
+	int ret = k_msgq_put(&cmd_msgq, &item, K_NO_WAIT);
+	if (ret < 0) {
+		LOG_WRN("Command queue full, dropping cmd 0x%02x", item.req.cmd);
+		return;
+	}
+
+	/* Signal the mem_engine thread */
+	k_sem_give(&cmd_sem);
+}
+
+/* IPC endpoint configuration */
+static struct ipc_ept_cfg ept_cfg = {
+	.name = IPC_ENDPOINT_NAME,
+	.cb = {
+		.bound    = ept_bound,
+		.received = ept_received,
+	},
+};
+
+/* ============================================================
+ * IPC Listener Thread (High Priority = 5)
+ * Receives RPMsg, queues commands, sends responses.
+ * ============================================================ */
+
+static void ipc_listener_thread(void *p1, void *p2, void *p3)
+{
+	const struct device *ipc_instance;
+	int ret;
+
+	LOG_INF("IPC Listener starting...");
+
+	/* Initialize IPC */
+	ipc_instance = DEVICE_DT_GET(DT_NODELABEL(ipc0));
+
+	ret = ipc_service_open_instance(ipc_instance);
+	if (ret < 0 && ret != -EALREADY) {
+		LOG_ERR("Failed to open IPC instance: %d", ret);
+		return;
+	}
+
+	ret = ipc_service_register_endpoint(ipc_instance, &ept, &ept_cfg);
+	if (ret < 0) {
+		LOG_ERR("Failed to register endpoint: %d", ret);
+		return;
+	}
+
+	LOG_INF("Waiting for M7 handshake...");
+	k_sem_take(&bound_sem, K_FOREVER);
+	LOG_INF("M4 IPC Listener ready.");
+
+	/* Main loop: send responses that mem_engine has prepared */
+	while (1) {
+		/* Wait for mem_engine to signal a response is ready */
+		k_sem_take(&resp_sem, K_FOREVER);
+
+		struct ipc_msg resp;
+		if (k_msgq_get(&resp_msgq, &resp, K_NO_WAIT) == 0) {
+			ret = ipc_service_send(&ept, &resp, sizeof(resp));
+			if (ret < 0) {
+				LOG_ERR("Failed to send response: %d", ret);
+			}
+		}
+	}
+}
+
+/* Static thread: IPC listener, high priority (PRIORITY=5) */
+K_THREAD_DEFINE(ipc_listener_tid, 2048,
+		ipc_listener_thread, NULL, NULL, NULL,
+		5, 0, 0);
+
+/* ============================================================
+ * Memory Engine Thread (Medium Priority = 7)
+ * Reads commands from queue, processes them, sends responses.
+ * All heavy work (compress, decompress, swap, filesystem) runs here.
+ * ============================================================ */
+
 static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 {
 	resp->cmd = CMD_RESPONSE;
@@ -76,11 +201,6 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 		break;
 	}
 	case CMD_GET_APP_LIST: {
-		/*
-		 * Respond with app count in size field.
-		 * The actual app list is sent in subsequent messages
-		 * to avoid exceeding RPMsg buffer size.
-		 */
 		int count = fs_get_app_count();
 		resp->status = (count > 0) ? STATUS_OK : STATUS_ERR_NO_APPS;
 		resp->size = count;
@@ -89,10 +209,6 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 		break;
 	}
 	case CMD_LOAD_APP: {
-		/*
-		 * Load app binary into memory and return handle.
-		 * req->handle contains the app id to load.
-		 */
 		uint8_t app_id = (uint8_t)(req->handle & 0xFF);
 		size_t loaded = fs_load_app(app_id, app_buf, sizeof(app_buf));
 
@@ -102,16 +218,13 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 			resp->size = 0;
 			LOG_INF("CMD_LOAD_APP id=%u -> NOT FOUND", app_id);
 		} else {
-			/* Allocate memory in the engine for the app */
 			uint16_t mem_handle = mem_alloc(loaded);
 			if (mem_handle == MEM_HANDLE_INVALID) {
 				resp->status = STATUS_ERR_NOMEM;
 				resp->handle = MEM_HANDLE_INVALID;
 				resp->size = 0;
-				LOG_INF("CMD_LOAD_APP id=%u -> NO MEMORY for %u bytes",
-					app_id, loaded);
+				LOG_INF("CMD_LOAD_APP id=%u -> NO MEMORY", app_id);
 			} else {
-				/* Copy app data into allocated memory */
 				mem_write(mem_handle, app_buf, loaded);
 				resp->status = STATUS_OK;
 				resp->handle = mem_handle;
@@ -123,11 +236,6 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 		break;
 	}
 	case CMD_FILE_OPEN: {
-		/*
-		 * Open a file for writing on SD card.
-		 * The filename is passed in the first 4 bytes of size field.
-		 * In practice, we'll use a fixed name for now.
-		 */
 		char filename[32];
 		snprintf(filename, sizeof(filename), "app_%04x.bin", req->handle);
 
@@ -146,18 +254,12 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 		break;
 	}
 	case CMD_FILE_WRITE: {
-		/*
-		 * Write data to an open file.
-		 * The data payload follows the IPC message.
-		 * For simplicity, we'll read from a shared buffer.
-		 */
 		extern uint8_t g_file_write_buf[FILE_WRITE_CHUNK_MAX];
 
 		int written = fs_file_write(req->handle, g_file_write_buf, req->size);
 		if (written > 0) {
 			resp->status = STATUS_OK;
 			resp->size = written;
-			LOG_DBG("CMD_FILE_WRITE fd=%d -> %d bytes", req->handle, written);
 		} else {
 			resp->status = STATUS_ERR_FILE_WRITE;
 			resp->size = 0;
@@ -166,9 +268,6 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 		break;
 	}
 	case CMD_FILE_CLOSE: {
-		/*
-		 * Close an open file.
-		 */
 		int ret = fs_file_close(req->handle);
 		if (ret == 0) {
 			resp->status = STATUS_OK;
@@ -188,49 +287,61 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 	}
 }
 
-static void ept_bound(void *priv)
+static void mem_engine_thread(void *p1, void *p2, void *p3)
 {
-	ept_ready = true;
-	k_sem_give(&bound_sem);
-	LOG_INF("Endpoint bound to M7");
-}
-
-static void ept_received(const void *data, size_t len, void *priv)
-{
-	if (len < sizeof(struct ipc_msg)) {
-		LOG_WRN("Received %zu bytes, expected %zu. Ignoring.",
-			len, sizeof(struct ipc_msg));
-		return;
-	}
-
-	const struct ipc_msg *req = (const struct ipc_msg *)data;
+	struct cmd_item item;
 	struct ipc_msg resp;
 	int ret;
 
-	process_command(req, &resp);
+	LOG_INF("Memory Engine thread starting...");
 
-	ret = ipc_service_send(&ept, &resp, sizeof(resp));
-	if (ret < 0) {
-		LOG_ERR("Failed to send response: %d", ret);
+	while (1) {
+		/* Block until a command arrives in the queue */
+		ret = k_sem_take(&cmd_sem, K_FOREVER);
+		if (ret != 0) {
+			continue;
+		}
+
+		/* Get the command from the queue */
+		ret = k_msgq_get(&cmd_msgq, &item, K_NO_WAIT);
+		if (ret != 0) {
+			continue;
+		}
+
+		LOG_DBG("Processing cmd 0x%02x", item.req.cmd);
+
+		/* Process the command (this is where heavy work happens) */
+		process_command(&item.req, &resp);
+
+		/* Put response in the response queue */
+		ret = k_msgq_put(&resp_msgq, &resp, K_NO_WAIT);
+		if (ret < 0) {
+			LOG_ERR("Response queue full, dropping response");
+			continue;
+		}
+
+		/* Signal the IPC listener to send the response */
+		k_sem_give(&resp_sem);
 	}
-
-	k_sem_give(&data_sem);
 }
 
-static struct ipc_ept_cfg ept_cfg = {
-	.name = IPC_ENDPOINT_NAME,
-	.cb = {
-		.bound    = ept_bound,
-		.received = ept_received,
-	},
-};
+/* Static thread: Memory engine, medium priority (PRIORITY=7) */
+K_THREAD_DEFINE(mem_engine_tid, 4096,
+		mem_engine_thread, NULL, NULL, NULL,
+		7, 0, 0);
+
+/* ============================================================
+ * Main (Initialization Only)
+ * Initializes hardware and subsystems, then the threads take over.
+ * main() thread has lowest priority and does nothing after init.
+ * ============================================================ */
 
 int main(void)
 {
-	const struct device *ipc_instance;
 	int ret;
 
 	LOG_INF("Gigaspark OS M4 Remote Core starting...");
+	LOG_INF("Architecture: 2 dedicated threads (ipc_listener + mem_engine)");
 
 	/* Initialize memory engine (includes SD swap init) */
 	mem_init();
@@ -243,28 +354,10 @@ int main(void)
 		LOG_INF("Filesystem ready, %d app(s) found", fs_get_app_count());
 	}
 
-	/* Initialize IPC */
-	ipc_instance = DEVICE_DT_GET(DT_NODELABEL(ipc0));
+	LOG_INF("M4 subsystems initialized. Threads are now running.");
+	LOG_INF("  ipc_listener: tid=%d, prio=5 (HIGH)", (int)ipc_listener_tid);
+	LOG_INF("  mem_engine:   tid=%d, prio=7 (MEDIUM)", (int)mem_engine_tid);
 
-	ret = ipc_service_open_instance(ipc_instance);
-	if (ret < 0 && ret != -EALREADY) {
-		LOG_ERR("Failed to open IPC instance: %d", ret);
-		return ret;
-	}
-
-	ret = ipc_service_register_endpoint(ipc_instance, &ept, &ept_cfg);
-	if (ret < 0) {
-		LOG_ERR("Failed to register endpoint: %d", ret);
-		return ret;
-	}
-
-	LOG_INF("Waiting for M7 handshake...");
-	k_sem_take(&bound_sem, K_FOREVER);
-	LOG_INF("M4 ready. Waiting for commands...");
-
-	while (1) {
-		k_sem_take(&data_sem, K_FOREVER);
-	}
-
+	/* main() thread sleeps forever - threads do all the work */
 	return 0;
 }
