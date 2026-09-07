@@ -28,6 +28,7 @@
 #include "fault_manager.h"
 #include "app_runner.h"
 #include "nav_bar.h"
+#include "power_manager.h"
 #include "net_manager.h"
 #include "app_downloader.h"
 
@@ -107,6 +108,9 @@ static void ui_launcher_thread(void *p1, void *p2, void *p3)
 
 	/* Initialize navigation bar */
 	nav_bar_init();
+
+	/* Initialize power manager */
+	power_manager_init();
 
 	/*
 	 * TODO: When LVGL display driver is ready, this thread will:
