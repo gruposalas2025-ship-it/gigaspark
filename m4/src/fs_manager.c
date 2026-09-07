@@ -287,3 +287,112 @@ int fs_file_close(int fd)
 	LOG_INF("File closed: fd=%d", fd);
 	return 0;
 }
+
+/* ---- Media Read Support ---- */
+
+/* Archivos multimedia abiertos para lectura */
+#define MEDIA_FD_MAX  2
+static struct fs_file_t media_files[MEDIA_FD_MAX];
+static bool media_file_open[MEDIA_FD_MAX] = { false, false };
+
+int fs_media_open(const char *filename)
+{
+	if (!fs_mounted || filename == NULL) {
+		return -ENODEV;
+	}
+
+	/* Buscar slot libre */
+	int fd = -1;
+	for (int i = 0; i < MEDIA_FD_MAX; i++) {
+		if (!media_file_open[i]) {
+			fd = i;
+			break;
+		}
+	}
+
+	if (fd < 0) {
+		LOG_ERR("No hay descriptors multimedia libres");
+		return -ENOMEM;
+	}
+
+	/* Construir ruta completa */
+	char path[64];
+	snprintf(path, sizeof(path), "%s%s", SD_MEDIA_PATH, filename);
+
+	/* Abrir para lectura */
+	memset(&media_files[fd], 0, sizeof(media_files[fd]));
+	int ret = fs_open(&media_files[fd], path, FS_O_READ);
+	if (ret < 0) {
+		LOG_ERR("No se pudo abrir %s: %d", path, ret);
+		return ret;
+	}
+
+	media_file_open[fd] = true;
+	LOG_INF("Media abierto: %s (fd=%d)", path, fd);
+	return fd;
+}
+
+int fs_media_read(int fd, uint8_t *buf, size_t buf_size, size_t *bytes_read)
+{
+	if (fd < 0 || fd >= MEDIA_FD_MAX || !media_file_open[fd]) {
+		return -EBADF;
+	}
+
+	if (buf == NULL || buf_size == 0 || bytes_read == NULL) {
+		return -EINVAL;
+	}
+
+	/* Leer chunk alineado a 32 bytes para DMA/DCACHE */
+	size_t aligned_size = (buf_size + 31) & ~31;
+	if (aligned_size > buf_size) {
+		aligned_size = buf_size;
+	}
+
+	ssize_t result = fs_read(&media_files[fd], buf, aligned_size);
+	if (result < 0) {
+		LOG_ERR("Error leyendo media fd=%d: %d", fd, (int)result);
+		*bytes_read = 0;
+		return (int)result;
+	}
+
+	*bytes_read = (size_t)result;
+	LOG_DBG("Media read fd=%d: %d bytes", fd, (int)result);
+	return 0;
+}
+
+int fs_media_seek(int fd, int32_t offset, int whence)
+{
+	if (fd < 0 || fd >= MEDIA_FD_MAX || !media_file_open[fd]) {
+		return -EBADF;
+	}
+
+	/* Mapear whence de IPC a Zephyr */
+	int fs_whence;
+	switch (whence) {
+	case 0:  fs_whence = FS_SEEK_SET; break;
+	case 1:  fs_whence = FS_SEEK_CUR; break;
+	case 2:  fs_whence = FS_SEEK_END; break;
+	default: return -EINVAL;
+	}
+
+	int ret = fs_seek(&media_files[fd], offset, fs_whence);
+	if (ret < 0) {
+		LOG_ERR("Seek error fd=%d: %d", fd, ret);
+	}
+	return ret;
+}
+
+int fs_media_close(int fd)
+{
+	if (fd < 0 || fd >= MEDIA_FD_MAX || !media_file_open[fd]) {
+		return -EBADF;
+	}
+
+	int ret = fs_close(&media_files[fd]);
+	media_file_open[fd] = false;
+
+	if (ret < 0) {
+		LOG_ERR("Media close error fd=%d: %d", fd, ret);
+	}
+	return ret;
+}

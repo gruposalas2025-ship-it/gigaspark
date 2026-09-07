@@ -59,6 +59,7 @@ static volatile bool ept_ready;
 static uint8_t io_buf[MEM_IO_MAX];
 static uint8_t app_buf[APP_BINARY_MAX_SIZE];
 uint8_t g_file_write_buf[FILE_WRITE_CHUNK_MAX];
+uint8_t g_media_read_buf[MEDIA_READ_CHUNK_MAX];
 
 /* ============================================================
  * IPC Callbacks (run in ISR context, must be FAST)
@@ -275,6 +276,65 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 		} else {
 			resp->status = STATUS_ERR_FILE_CLOSE;
 			LOG_ERR("CMD_FILE_CLOSE fd=%d -> %d", req->handle, ret);
+		}
+		break;
+	}
+	case CMD_MEDIA_OPEN: {
+		/* El nombre del archivo viene en el campo handle como indice
+		 * simplificado. En un caso real se enviaria en el payload. */
+		char filename[32];
+		snprintf(filename, sizeof(filename), "media_%04x.dat", req->handle);
+
+		int fd = fs_media_open(filename);
+		if (fd >= 0) {
+			resp->status = STATUS_OK;
+			resp->handle = (uint16_t)fd;
+			resp->size = 0;
+			LOG_INF("CMD_MEDIA_OPEN %s -> fd=%d", filename, fd);
+		} else {
+			resp->status = STATUS_ERR_MEDIA_OPEN;
+			resp->handle = MEM_HANDLE_INVALID;
+			LOG_ERR("CMD_MEDIA_OPEN %s -> %d", filename, fd);
+		}
+		break;
+	}
+	case CMD_MEDIA_READ: {
+		extern uint8_t g_media_read_buf[MEDIA_READ_CHUNK_MAX];
+
+		size_t bytes_read = 0;
+		int ret = fs_media_read(req->handle, g_media_read_buf,
+					req->size, &bytes_read);
+		if (ret == 0 && bytes_read > 0) {
+			resp->status = STATUS_OK;
+			resp->size = bytes_read;
+		} else {
+			resp->status = STATUS_ERR_MEDIA_READ;
+			resp->size = 0;
+		}
+		break;
+	}
+	case CMD_MEDIA_SEEK: {
+		/* offset en resp->size, whence en resp->handle (0=SET,1=CUR,2=END) */
+		int ret = fs_media_seek(req->handle, (int32_t)req->size,
+					req->handle & 0xFF);
+		if (ret == 0) {
+			resp->status = STATUS_OK;
+			LOG_INF("CMD_MEDIA_SEEK fd=%d offset=%d -> OK",
+				req->handle, req->size);
+		} else {
+			resp->status = STATUS_ERR_MEDIA_SEEK;
+			LOG_ERR("CMD_MEDIA_SEEK fd=%d -> %d", req->handle, ret);
+		}
+		break;
+	}
+	case CMD_MEDIA_CLOSE: {
+		int ret = fs_media_close(req->handle);
+		if (ret == 0) {
+			resp->status = STATUS_OK;
+			LOG_INF("CMD_MEDIA_CLOSE fd=%d -> OK", req->handle);
+		} else {
+			resp->status = STATUS_ERR_MEDIA_CLOSE;
+			LOG_ERR("CMD_MEDIA_CLOSE fd=%d -> %d", req->handle, ret);
 		}
 		break;
 	}

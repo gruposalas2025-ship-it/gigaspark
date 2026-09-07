@@ -19,6 +19,10 @@ enum ipc_cmd {
 	CMD_FILE_OPEN     = 0x20,  /* M7 -> M4: open file for writing */
 	CMD_FILE_WRITE    = 0x21,  /* M7 -> M4: write data chunk to file */
 	CMD_FILE_CLOSE    = 0x22,  /* M7 -> M4: close file */
+	CMD_MEDIA_OPEN    = 0x30,  /* M7 -> M4: open media file for reading */
+	CMD_MEDIA_READ    = 0x31,  /* M7 -> M4: read chunk de multimedia */
+	CMD_MEDIA_SEEK    = 0x32,  /* M7 -> M4: mover cursor en archivo media */
+	CMD_MEDIA_CLOSE   = 0x33,  /* M7 -> M4: cerrar archivo multimedia */
 	CMD_RESPONSE      = 0x80,  /* M4 -> M7: response with data */
 };
 
@@ -37,6 +41,10 @@ enum ipc_status {
 	STATUS_ERR_FILE_WRITE  = -10,
 	STATUS_ERR_FILE_CLOSE  = -11,
 	STATUS_ERR_NO_SD       = -12,
+	STATUS_ERR_MEDIA_OPEN  = -13,
+	STATUS_ERR_MEDIA_READ  = -14,
+	STATUS_ERR_MEDIA_SEEK  = -15,
+	STATUS_ERR_MEDIA_CLOSE = -16,
 };
 
 /* IPC message structure (fixed size for OpenAMP safety) */
@@ -76,6 +84,12 @@ struct __packed app_info {
 
 /* File write chunk size (must fit in IPC message with overhead) */
 #define FILE_WRITE_CHUNK_MAX  24
+
+/* Media read chunk size (max payload per IPC) */
+#define MEDIA_READ_CHUNK_MAX  24
+
+/* Media file path on SD */
+#define SD_MEDIA_PATH  "/SD:/media/"
 
 /* File path on SD card */
 #define SD_APPS_PATH  "/SD:/apps/"

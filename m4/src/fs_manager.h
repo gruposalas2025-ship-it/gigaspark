@@ -77,4 +77,44 @@ int fs_file_write(int fd, const uint8_t *data, size_t len);
  */
 int fs_file_close(int fd);
 
+/* ---- Media Read API ---- */
+
+/*
+ * Abrir archivo multimedia para lectura.
+ *
+ * @param filename  Nombre del archivo (relativo a /SD:/media/).
+ * @return          File descriptor (>= 0) o error negativo.
+ */
+int fs_media_open(const char *filename);
+
+/*
+ * Leer chunk de archivo multimedia.
+ * Los datos se leen alineados a 32 bytes para DMA/DCACHE.
+ *
+ * @param fd         File descriptor de fs_media_open.
+ * @param buf        Buffer de destino.
+ * @param buf_size   Tamano maximo a leer.
+ * @param bytes_read Puntero donde almacenar bytes leidos.
+ * @return           0 en exito, error negativo.
+ */
+int fs_media_read(int fd, uint8_t *buf, size_t buf_size, size_t *bytes_read);
+
+/*
+ * Mover cursor en archivo multimedia.
+ *
+ * @param fd      File descriptor.
+ * @param offset  Offset en bytes.
+ * @param whence  0=SET, 1=CUR, 2=END.
+ * @return        0 en exito, error negativo.
+ */
+int fs_media_seek(int fd, int32_t offset, int whence);
+
+/*
+ * Cerrar archivo multimedia.
+ *
+ * @param fd  File descriptor.
+ * @return    0 en exito, error negativo.
+ */
+int fs_media_close(int fd);
+
 #endif /* GIGASPARK_FS_MANAGER_H */
