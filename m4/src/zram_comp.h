@@ -78,4 +78,9 @@ uint32_t zram_evict_block(uint32_t handle);
  */
 void zram_get_stats(uint8_t *used, uint8_t *total, uint32_t *counter);
 
+/*
+ * Reinicia la tabla LRU (para tests).
+ */
+void zram_reset(void);
+
 #endif /* GIGASPARK_ZRAM_COMP_H */

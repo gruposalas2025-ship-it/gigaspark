@@ -156,6 +156,7 @@ static int lru_insert(uint32_t handle, const uint8_t *data,
 			zram_table[i].handle = handle;
 			zram_table[i].size_orig = size_orig;
 			zram_table[i].size_comp = size_comp;
+			zram_table[i].in_use = 1;
 			memcpy(zram_table[i].data, data, size_comp);
 			lru_touch(i);
 			zram_used_count++;
@@ -323,4 +324,11 @@ void zram_get_stats(uint8_t *used, uint8_t *total, uint32_t *counter)
 	if (counter) {
 		*counter = lru_global_counter;
 	}
+}
+
+void zram_reset(void)
+{
+	memset(zram_table, 0, sizeof(zram_table));
+	lru_global_counter = 0;
+	zram_used_count = 0;
 }
