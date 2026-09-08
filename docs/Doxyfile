@@ -1,0 +1,46 @@
+# Doxyfile - Gigaspark OS SDK Documentation
+# Ejecutar: doxygen docs/Doxyfile
+
+PROJECT_NAME           = "Gigaspark OS SDK"
+PROJECT_NUMBER         = "1.0"
+PROJECT_BRIEF          = "API publica para apps de Gigaspark OS"
+OUTPUT_DIRECTORY       = docs/html
+INPUT                  = sdk/
+FILE_PATTERNS          = *.h *.c
+RECURSIVE              = NO
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+
+# Formato de salida
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+HTML_COLORSTYLE_HUE    = 200
+HTML_COLORSTYLE_SAT    = 100
+HTML_COLORSTYLE_GAMMA  = 80
+
+# Navegacion
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+
+# Diagramas (opcional, requiere graphviz)
+HAVE_DOT               = NO
+CLASS_DIAGRAMS         = NO
+
+# Filtros
+FILTER_SOURCE_FILES    = NO
+STRIP_CODE_COMMENTS    = NO
+
+# Fuente
+SOURCE_BROWSER         = NO
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = NO
+
+# Optimizacion
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES

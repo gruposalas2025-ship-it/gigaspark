@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Para funciones de sistema (bateria, timeout) */
+#include "../m7/src/power_manager.h"
+
 LOG_MODULE_REGISTER(gigaspark_sdk, CONFIG_LOG_DEFAULT_LEVEL);
 
 /* ---- Memory ---- */
@@ -296,6 +299,28 @@ static void giga_zram_get_stats_impl(uint8_t *used, uint8_t *total,
 	(void)used; (void)total; (void)counter;
 }
 
+/* ---- Sistema (Fase 20) ---- */
+
+static uint8_t giga_get_battery_pct_impl(void)
+{
+	/*
+	 * Stub: no hay hardware de bateria configurado.
+	 * Futuramente leera un canal ADC (A8/A9) con divisor de voltaje.
+	 * Por ahora retorna 100% (alimentacion USB/DC directa).
+	 */
+	return 100;
+}
+
+static uint32_t giga_get_screen_timeout_impl(void)
+{
+	return power_get_timeout();
+}
+
+static void giga_set_screen_timeout_impl(uint32_t seconds)
+{
+	power_set_timeout(seconds);
+}
+
 /* ---- Export Table ---- */
 
 static const giga_api_t giga_api_table = {
@@ -332,6 +357,10 @@ static const giga_api_t giga_api_table = {
 	.zram_store     = giga_zram_store_impl,
 	.zram_load      = giga_zram_load_impl,
 	.zram_get_stats = giga_zram_get_stats_impl,
+	/* Fase 20: Sistema */
+	.get_battery_pct     = giga_get_battery_pct_impl,
+	.get_screen_timeout  = giga_get_screen_timeout_impl,
+	.set_screen_timeout  = giga_set_screen_timeout_impl,
 };
 
 /*

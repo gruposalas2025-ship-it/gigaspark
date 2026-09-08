@@ -9,12 +9,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/* Tiempo de inactividad antes de dormir (segundos) */
-#define POWER_SLEEP_TIMEOUT_S  15
+/* Tiempo de inactividad por defecto (segundos) */
+#define POWER_SLEEP_TIMEOUT_DEFAULT_S  15
+#define POWER_SLEEP_TIMEOUT_MIN_S      5
+#define POWER_SLEEP_TIMEOUT_MAX_S      60
 
 /*
  * Inicializar el gestor de energia.
- * Configura el timer de inactividad y el callback de input.
+ * Configura el timer de inactividad con el timeout por defecto.
  */
 void power_manager_init(void);
 
@@ -39,5 +41,18 @@ void power_force_sleep(void);
  * Despertar el sistema manualmente.
  */
 void power_force_wake(void);
+
+/*
+ * Configurar el timeout de inactividad.
+ * @param seconds  Tiempo en segundos (5-60). Valores fuera de rango
+ *                 se ajustan automaticamente.
+ */
+void power_set_timeout(uint32_t seconds);
+
+/*
+ * Obtener el timeout de inactividad actual.
+ * @return Timeout en segundos.
+ */
+uint32_t power_get_timeout(void);
 
 #endif /* GIGASPARK_POWER_MANAGER_H */

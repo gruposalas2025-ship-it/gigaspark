@@ -7,7 +7,7 @@
  * NO usa CONFIG_PM de Zephyr (no soportado en H7).
  *
  * Flujo:
- * 1. Timer de 15 segundos se resetea con cada toque
+ * 1. Timer configurable se resetea con cada toque
  * 2. Al expirar: apagar backlight + suspender LVGL + STOP D1
  * 3. Al tocar: WFI retorna automaticamente + reanudar LVGL
  */
@@ -31,6 +31,9 @@ static K_TIMER_DEFINE(inactivity_timer, inactivity_timeout_handler, NULL);
 static volatile bool system_sleeping = false;
 static volatile bool power_initialized = false;
 
+/* Timeout configurable (segundos) */
+static uint32_t sleep_timeout_s = POWER_SLEEP_TIMEOUT_DEFAULT_S;
+
 /*
  * Callback del timer: el sistema debe dormirse.
  */
@@ -43,7 +46,7 @@ static void inactivity_timeout_handler(struct k_timer *timer)
 	}
 
 	LOG_INF("=== MODO SUSPENSION ===");
-	LOG_INF("Inactividad detectada (%d s) - durmiendo...", POWER_SLEEP_TIMEOUT_S);
+	LOG_INF("Inactividad detectada (%u s) - durmiendo...", sleep_timeout_s);
 
 	/* Paso 1: Suspender hilo de LVGL */
 	LOG_INF("[1/3] Suspendiendo hilo UI...");
@@ -76,12 +79,12 @@ void power_manager_init(void)
 {
 	LOG_INF("Inicializando gestor de energia...");
 
-	/* Configurar timer de inactividad (15 segundos, periodico) */
-	k_timer_start(&inactivity_timer, K_SECONDS(POWER_SLEEP_TIMEOUT_S),
-		      K_SECONDS(POWER_SLEEP_TIMEOUT_S));
+	/* Configurar timer de inactividad */
+	k_timer_start(&inactivity_timer, K_SECONDS(sleep_timeout_s),
+		      K_SECONDS(sleep_timeout_s));
 
 	power_initialized = true;
-	LOG_INF("Gestor de energia listo (timeout: %d s)", POWER_SLEEP_TIMEOUT_S);
+	LOG_INF("Gestor de energia listo (timeout: %u s)", sleep_timeout_s);
 }
 
 /*
@@ -99,8 +102,8 @@ void power_notify_activity(void)
 	}
 
 	/* Resetear timer de inactividad */
-	k_timer_start(&inactivity_timer, K_SECONDS(POWER_SLEEP_TIMEOUT_S),
-		      K_SECONDS(POWER_SLEEP_TIMEOUT_S));
+	k_timer_start(&inactivity_timer, K_SECONDS(sleep_timeout_s),
+		      K_SECONDS(sleep_timeout_s));
 }
 
 bool power_is_sleeping(void)
@@ -134,9 +137,34 @@ void power_force_wake(void)
 	k_thread_resume(ui_launcher_tid);
 
 	/* Resetear timer */
-	k_timer_start(&inactivity_timer, K_SECONDS(POWER_SLEEP_TIMEOUT_S),
-		      K_SECONDS(POWER_SLEEP_TIMEOUT_S));
+	k_timer_start(&inactivity_timer, K_SECONDS(sleep_timeout_s),
+		      K_SECONDS(sleep_timeout_s));
 
 	system_sleeping = false;
 	LOG_INF("[2/2] Sistema operativo");
+}
+
+void power_set_timeout(uint32_t seconds)
+{
+	if (seconds < POWER_SLEEP_TIMEOUT_MIN_S) {
+		seconds = POWER_SLEEP_TIMEOUT_MIN_S;
+	}
+	if (seconds > POWER_SLEEP_TIMEOUT_MAX_S) {
+		seconds = POWER_SLEEP_TIMEOUT_MAX_S;
+	}
+
+	sleep_timeout_s = seconds;
+
+	/* Reiniciar timer con el nuevo valor si esta inicializado */
+	if (power_initialized) {
+		k_timer_start(&inactivity_timer, K_SECONDS(sleep_timeout_s),
+			      K_SECONDS(sleep_timeout_s));
+	}
+
+	LOG_INF("Timeout de suspension cambiado a %u s", sleep_timeout_s);
+}
+
+uint32_t power_get_timeout(void)
+{
+	return sleep_timeout_s;
 }
