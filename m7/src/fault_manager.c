@@ -84,6 +84,7 @@ void fault_manager_app_stop(void)
  */
 void z_arm_pendsv_isr(void *exc_ptr)
 {
+	(void)exc_ptr;
 	if (!ctx.fault_occurred) {
 		return;
 	}

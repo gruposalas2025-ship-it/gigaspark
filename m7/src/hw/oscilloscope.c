@@ -21,7 +21,7 @@ int osc_init(void)
 {
 	LOG_INF("Inicializando osciloscopio...");
 	LOG_INF("CH1: A0 (PC0), CH2: A1 (PA4)");
-	LOG_INF("Rango: 0-%.0fV, Divisor: %.0f:1", OSC_VMAX, OSC_DIVIDER);
+	LOG_INF("Rango: 0-%.0fV, Divisor: %.0f:1", (double)OSC_VMAX, (double)OSC_DIVIDER);
 
 #if defined(CONFIG_ADC) && DT_NODE_EXISTS(DT_PATH(zephyr_user))
 	LOG_INF("ADC habilitado en DTS - modo hardware");
@@ -82,7 +82,7 @@ float osc_get_voltage(uint8_t channel)
 		return -1.0f;
 	}
 
-	uint16_t buf[1];
+	uint16_t buf[1] = {0};
 	int ret = osc_capture(channel, buf, 1, 1000);
 	if (ret < 0) {
 		return -1.0f;

@@ -57,6 +57,7 @@ uint8_t g_file_write_buf[FILE_WRITE_CHUNK_MAX];
 
 static void ept_bound(void *priv)
 {
+	(void)priv;
 	ept_ready = true;
 	k_sem_give(&bound_sem);
 	LOG_INF("Endpoint bound to M4");
@@ -64,6 +65,7 @@ static void ept_bound(void *priv)
 
 static void ept_received(const void *data, size_t len, void *priv)
 {
+	(void)priv;
 	if (len < sizeof(struct ipc_msg)) {
 		return;
 	}
@@ -104,6 +106,7 @@ int send_ipc_cmd(struct ipc_msg *cmd, struct ipc_msg *resp)
 
 static void ui_launcher_thread(void *p1, void *p2, void *p3)
 {
+	(void)p1; (void)p2; (void)p3;
 	LOG_INF("UI Launcher thread starting...");
 
 	/* Initialize navigation bar */
@@ -142,6 +145,7 @@ K_THREAD_DEFINE(ui_launcher_tid, 4096,
 
 static void app_runner_thread(void *p1, void *p2, void *p3)
 {
+	(void)p1; (void)p2; (void)p3;
 	int ret;
 
 	LOG_INF("App Runner thread starting...");

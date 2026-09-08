@@ -95,16 +95,6 @@ static void buddy_init_internal(void)
 }
 
 /*
- * Calcula la direccion base de un bloque en un nivel dado.
- */
-static uint32_t buddy_block_address(int order, int index)
-{
-	int block_size = 1 << order;
-	int base_offset = index * block_size;
-	return (uint32_t)(buddy_pool - (uint8_t *)0) + base_offset;
-}
-
-/*
  * Marca un rango de bloques de 32 bytes como ocupado/libre en el bitmap.
  */
 static void buddy_mark_range(uint32_t offset, uint32_t size, int used)
@@ -238,7 +228,7 @@ uint32_t mem_alloc(uint32_t size)
 
 	/* Encontrar el orden minimo que contiene el tamano solicitado */
 	int target_order = BUDDY_MIN_ORDER;
-	while ((1 << target_order) < size) {
+	while (((uint32_t)1 << target_order) < size) {
 		target_order++;
 	}
 

@@ -51,7 +51,7 @@ int power_set_voltage(uint8_t channel, float voltage)
 	float normalized = voltage / PS_VMAX;
 	uint8_t wiper = (uint8_t)(normalized * 255.0f);
 
-	LOG_INF("CH%d: %.1fV (wiper=%d)", channel + 1, voltage, wiper);
+	LOG_INF("CH%d: %.1fV (wiper=%d)", channel + 1, (double)voltage, wiper);
 
 	/*
 	 * Implementacion real SPI:

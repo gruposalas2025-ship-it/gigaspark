@@ -67,6 +67,7 @@ uint8_t g_media_read_buf[MEDIA_READ_CHUNK_MAX];
 
 static void ept_bound(void *priv)
 {
+	(void)priv;
 	ept_ready = true;
 	k_sem_give(&bound_sem);
 	LOG_INF("Endpoint bound to M7");
@@ -74,6 +75,7 @@ static void ept_bound(void *priv)
 
 static void ept_received(const void *data, size_t len, void *priv)
 {
+	(void)priv;
 	if (len < sizeof(struct ipc_msg)) {
 		return;
 	}
@@ -109,6 +111,7 @@ static struct ipc_ept_cfg ept_cfg = {
 
 static void ipc_listener_thread(void *p1, void *p2, void *p3)
 {
+	(void)p1; (void)p2; (void)p3;
 	const struct device *ipc_instance;
 	int ret;
 
@@ -349,6 +352,7 @@ static void process_command(const struct ipc_msg *req, struct ipc_msg *resp)
 
 static void mem_engine_thread(void *p1, void *p2, void *p3)
 {
+	(void)p1; (void)p2; (void)p3;
 	struct cmd_item item;
 	struct ipc_msg resp;
 	int ret;

@@ -78,6 +78,7 @@ void nav_bar_hide(void)
 
 bool nav_bar_touch_hit(int x, int y)
 {
+	(void)x;
 	return nav_bar_visible && (y >= TOUCH_ZONE_Y_START) && (y < SCREEN_HEIGHT);
 }
 

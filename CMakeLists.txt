@@ -5,6 +5,9 @@ cmake_minimum_required(VERSION 3.20.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(gigaspark_m7)
 
+# Strict compilation: treat all warnings as errors (Fase 18)
+target_compile_options(app PRIVATE -Werror -Wall -Wextra)
+
 target_sources(app PRIVATE
 	m7/src/main.c
 	m7/src/app_runner.c
