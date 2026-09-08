@@ -13,6 +13,9 @@ target_sources(app PRIVATE
 	m7/src/power_manager.c
 	m7/src/video_decoder.c
 	m7/src/audio_i2s.c
+	m7/src/hw/oscilloscope.c
+	m7/src/hw/power_supply.c
+	m7/src/hw/rf_tools.c
 	m7/src/net_manager.c
 	m7/src/app_downloader.c
 	sdk/gigaspark_api.c
@@ -20,6 +23,7 @@ target_sources(app PRIVATE
 
 target_include_directories(app PRIVATE
 	m7/src
+	m7/src/hw
 	common
 	common/include
 	sdk
