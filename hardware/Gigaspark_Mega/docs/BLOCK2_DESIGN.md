@@ -217,7 +217,62 @@ Con VCC = 3.3V:
 
 ---
 
-## CONSIDERACIONES DE DISENO
+## 4. SELECCION DE RANGO - MULTIPLEXOR ANALOGICO (Fase 17)
+
+### Problema
+El ADC del STM32H747 tiene resolucion de 12 bits (4096 niveles) con rango 0-3.3V.
+Para senales pequenas (0-300mV), la resolucion es insuficiente (solo ~370 niveles).
+
+### Solucion: CD4052 (Multiplexor Dual 4:1)
+Se anade un multiplexor analogico para seleccionar entre 2 rangos:
+- **1x (Directo):** 0V a 3.3V (resolucion maxima: 0.8mV/nivel)
+- **10x (Divisor):** 0V a 30V (resolucion: 7.3mV/nivel)
+
+### Esquema del Circuito
+```
+                     Divisor              MUX            Buffer         ADC
+                     (10x)             CD4052          (Op-Amp)
+                     R1 (91k)          +-------+        MCP6002
+   BNC CHx ---+---[====]---+--------->| S0  Y0|---+---(IN+)---+--- A0/A1
+              |            |          |       |    |            |
+              |            +---------->| S1  Y1|--->|           |
+              |            |          |       |    +---(IN-)---+
+              |            |          |  COM  |    |
+              |            R2 (10k)   |       |    |
+              |            |          +-------+    |
+              |            |             |         |
+              |            GND          GND        GND
+              |
+              +---[====]---+----->| COM  Y0|----(directo a IN+)
+                  R_div (91k)
+                  R_gnd (10k)
+```
+
+### Pines de Control MUX
+| Pin MCU | Pin CD4052 | Funcion |
+|---------|------------|---------|
+| PD14    | S0         | Selector rango CH1 |
+| PD13    | S1         | Selector rango CH2 |
+
+### Calculo de Resistencias por Rango
+
+**Rango 1x (Directo 0-3.3V):**
+- Entrada directa al buffer (sin divisor)
+- Resolucion: 3.3V / 4096 = 0.806 mV/nivel
+
+**Rango 10x (Divisor 0-30V):**
+- Mismo divisor que antes: R1=91k, R2=10k
+- Resolucion: 30V / 4096 = 7.32 mV/nivel
+
+### Condensadores de Desacoplo (Fase 17)
+- **C_opamp1:** 100nF ceramic en VCC del MCP6002 (canal A)
+- **C_opamp2:** 100nF ceramic en VCC del MCP6002 (canal B)
+- **C_mux:** 100nF ceramic en VDD del CD4052
+- **Proposito:** Reducir ruido de la fuente de alimentacion
+
+---
+
+## 5. PROTECCION GENERAL (Fase 17)
 
 ### Separacion de Suelos (GND)
 - **GND analogico:** Conectado al GND del MCU
@@ -227,12 +282,20 @@ Con VCC = 3.3V:
 ### Ancho de Banda del Osciloscopio
 - **Frecuencia muestreo ADC:** 3.6 MSPS (STM32H747)
 - **Ancho de banda util:** ~1.8 MHz (Nyquist)
-- **Para 30V pico a pico:** Funciona bien para señales DC y bajas frecuencias
+- **Para 30V pico a pico:** Funciona bien para senales DC y bajas frecuencias
 
 ### Proteccion General
 - Todos los diodos BAT54S protegen contra transientes
 - Resistencias de entrada limitan corriente de fault
 - Fuse en la entrada de corriente (opcional pero recomendado)
+
+### Componentes Adicionales Fase 17
+| Ref | Componente | Cantidad | Valor | Notas |
+|-----|------------|----------|-------|-------|
+| U4  | CD4052     | 1        | Dual MUX 4:1 | Seleccion de rango |
+| C_opamp1 | Ceramic | 1    | 100nF | Desacoplo MCP6002 A |
+| C_opamp2 | Ceramic | 1    | 100nF | Desacoplo MCP6002 B |
+| C_mux | Ceramic  | 1      | 100nF | Desacoplo CD4052 |
 
 ---
 

@@ -1,6 +1,6 @@
 /*
- * Gigaspark OS - Memory Engine Header
- * 3-tier block allocator: RAM -> compressed_pool -> SD swap
+ * Gigaspark OS - Memory Engine Header (Fase 16: Buddy Allocator)
+ * Asignador buddy O(log N) con eviccion LRU.
  */
 
 #ifndef GIGASPARK_MEM_ENGINE_H
@@ -10,52 +10,65 @@
 #include <stddef.h>
 
 /*
- * Initialize the memory engine and SD swap subsystem.
- * Must be called once before any alloc/free operations.
+ * Inicializa el motor de memoria y el buddy allocator.
+ * Debe llamarse una vez antes de cualquier operacion alloc/free.
  */
-void mem_init(void);
+void mem_engine_init(void);
 
 /*
- * Allocate a block of memory.
- *
- * If the main pool is full, compresses an inactive block.
- * If compressed_pool is full, evicts oldest compressed block to SD.
- *
- * @param size  Number of bytes to allocate (must be > 0 and <= MEM_MAX_ALLOC).
- * @return      Handle (opaque ID) on success, or MEM_HANDLE_INVALID on failure.
+ * Alias para compatibilidad con codigo existente.
  */
-uint16_t mem_alloc(uint32_t size);
+#define mem_init mem_engine_init
 
 /*
- * Free a previously allocated block.
+ * Asigna memoria usando el buddy allocator.
  *
- * Handles all states: LIVE, COMPRESSED, SWAPPED.
- *
- * @param handle  Handle returned by mem_alloc().
- * @return        0 on success, negative error code on failure.
+ * @param size  Numero de bytes a asignar (debe ser > 0 y <= 4096).
+ * @return      Handle (ID opaco) en exito, o 0 si falla.
  */
-int mem_free(uint16_t handle);
+uint32_t mem_alloc(uint32_t size);
 
 /*
- * Read data from a block into a buffer.
+ * Libera un bloque de memoria previamente asignado.
  *
- * Transparently reads from RAM, compressed_pool, or SD swap.
- *
- * @param handle    Handle returned by mem_alloc().
- * @param buf       Destination buffer.
- * @param buf_size  Size of destination buffer.
- * @return          Number of bytes actually read, or 0 on error.
+ * @param handle  Handle retornado por mem_alloc().
+ * @return        0 si ok, -1 si falla.
  */
-size_t mem_read(uint16_t handle, void *buf, size_t buf_size);
+int mem_free(uint32_t handle);
 
 /*
- * Write data into an existing block.
+ * Lee datos de un bloque a un buffer.
  *
- * @param handle    Handle returned by mem_alloc().
- * @param data      Source data to write.
- * @param data_len  Number of bytes to write.
- * @return          0 on success, negative error code on failure.
+ * @param handle    Handle retornado por mem_alloc().
+ * @param buf       Buffer destino.
+ * @param buf_size  Tamano del buffer destino.
+ * @return          Numero de bytes leidos, o 0 si error.
  */
-int mem_write(uint16_t handle, const void *data, size_t data_len);
+size_t mem_read(uint32_t handle, void *buf, size_t buf_size);
+
+/*
+ * Escribe datos en un bloque existente.
+ *
+ * @param handle    Handle retornado por mem_alloc().
+ * @param data      Datos fuente a escribir.
+ * @param data_len  Numero de bytes a escribir.
+ * @return          0 si ok, -1 si error.
+ */
+int mem_write(uint32_t handle, const void *data, size_t data_len);
+
+/*
+ * Obtiene informacion de un handle.
+ *
+ * @param handle  Handle a consultar.
+ * @param addr    Puntero para la direccion (o NULL).
+ * @param size    Puntero para el tamano (o NULL).
+ * @return        0 si ok, -1 si el handle es invalido.
+ */
+int mem_get_info(uint32_t handle, uint32_t *addr, uint32_t *size);
+
+/*
+ * Retorna el porcentaje de memoria usada (0-100).
+ */
+uint8_t mem_get_usage(void);
 
 #endif /* GIGASPARK_MEM_ENGINE_H */

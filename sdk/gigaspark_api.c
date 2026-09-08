@@ -7,6 +7,7 @@
  */
 
 #include "gigaspark_api.h"
+#include "ipc_protocol.h"
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -190,7 +191,7 @@ static void giga_set_font_impl(uint8_t font_id)
 
 static void giga_get_text_size_impl(const char *text, int *w, int *h)
 {
-	/* Rough estimate: 8px per char, 16px height */
+	/* Estimacion: 8px por char, 16px alto */
 	if (text) {
 		if (w) *w = strlen(text) * 8;
 		if (h) *h = 16;
@@ -198,6 +199,101 @@ static void giga_get_text_size_impl(const char *text, int *w, int *h)
 		if (w) *w = 0;
 		if (h) *h = 0;
 	}
+}
+
+/* ---- Red (Fase 16) ---- */
+
+static int giga_http_get_impl(const char *url, uint8_t *buf,
+			      size_t buf_len, size_t *out_len)
+{
+	/*
+	 * Implementacion stub para HTTP GET.
+	 * En produccion, esto usaria la pila TCP/IP de Zephyr
+	 * (NET_SOCKETS) para hacer una peticion HTTP/HTTPS.
+	 *
+	 * Por ahora, retorna -ENOSYS (no implementado).
+	 * Las apps que requieran red deben usar el WiFi manager
+	 * y las funciones de socket directamente.
+	 */
+	(void)url; (void)buf; (void)buf_len;
+	if (out_len) *out_len = 0;
+	return -ENOSYS;
+}
+
+static int giga_http_post_impl(const char *url, const char *content_type,
+			       const uint8_t *data, size_t data_len,
+			       uint8_t *buf, size_t buf_len, size_t *out_len)
+{
+	/*
+	 * Implementacion stub para HTTP POST.
+	 * Mismo caso que GET: requiere pila TCP/IP completa.
+	 * Las apps pueden usar net_manager.c directamente.
+	 */
+	(void)url; (void)content_type; (void)data; (void)data_len;
+	(void)buf; (void)buf_len;
+	if (out_len) *out_len = 0;
+	return -ENOSYS;
+}
+
+/* ---- Memoria Avanzada (Fase 16) ---- */
+
+static uint32_t giga_mem_alloc_buddy_impl(uint32_t size)
+{
+	/* Delegar al motor de memoria M4 via IPC */
+	struct ipc_msg msg = {
+		.cmd = CMD_ALLOC,
+		.status = 0,
+		.handle = 0,
+		.size = size,
+	};
+	int ret = giga_ipc_send_impl(CMD_ALLOC, &msg, sizeof(msg));
+	if (ret < 0) {
+		return 0;
+	}
+	/* En una implementacion real, esperariamos la respuesta */
+	return 0;
+}
+
+static void giga_mem_free_buddy_impl(uint32_t handle)
+{
+	/* Delegar al motor de memoria M4 via IPC */
+	struct ipc_msg msg = {
+		.cmd = CMD_FREE,
+		.status = 0,
+		.handle = (uint16_t)handle,
+		.size = 0,
+	};
+	giga_ipc_send_impl(CMD_FREE, &msg, sizeof(msg));
+}
+
+static uint8_t giga_mem_get_usage_impl(void)
+{
+	/* En una implementacion real, esto consultaria al M4 */
+	return 0;
+}
+
+/* ---- zRAM LRU (Fase 16) ---- */
+
+static size_t giga_zram_store_impl(uint32_t handle, const uint8_t *data,
+				   size_t len)
+{
+	/* En produccion, esto comprime y almacena via M4 */
+	(void)handle; (void)data; (void)len;
+	return 0;
+}
+
+static size_t giga_zram_load_impl(uint32_t handle, uint8_t *buf,
+				  size_t buf_len)
+{
+	/* En produccion, esto recupera y descomprime via M4 */
+	(void)handle; (void)buf; (void)buf_len;
+	return 0;
+}
+
+static void giga_zram_get_stats_impl(uint8_t *used, uint8_t *total,
+				     uint32_t *counter)
+{
+	(void)used; (void)total; (void)counter;
 }
 
 /* ---- Export Table ---- */
@@ -225,6 +321,17 @@ static const giga_api_t giga_api_table = {
 	.ipc_recv      = giga_ipc_recv_impl,
 	.set_font      = giga_set_font_impl,
 	.get_text_size = giga_get_text_size_impl,
+	/* Fase 16: Red */
+	.http_get      = giga_http_get_impl,
+	.http_post     = giga_http_post_impl,
+	/* Fase 16: Memoria avanzada */
+	.mem_alloc_buddy = giga_mem_alloc_buddy_impl,
+	.mem_free_buddy  = giga_mem_free_buddy_impl,
+	.mem_get_usage   = giga_mem_get_usage_impl,
+	/* Fase 16: zRAM LRU */
+	.zram_store     = giga_zram_store_impl,
+	.zram_load      = giga_zram_load_impl,
+	.zram_get_stats = giga_zram_get_stats_impl,
 };
 
 /*

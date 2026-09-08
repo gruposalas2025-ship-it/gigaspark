@@ -201,10 +201,92 @@ Para calibrar: medir I real con amperimetro, ajustar offset y gain
 
 ---
 
-## 7. SEGURIDAD
+## 7. SEGURIDAD Y PROTECCION (Fase 17)
 
-- **PPTC:** Se abre a 5A, protege contra cortocircuito
-- **Diodo Schottky:** Previene dano por polaridad inversa
-- **Relés:** Galvanicamente separados del MCU
-- **Separacion GND:** GND de potencia solo se une al GND del MCU en un punto
-- **Pistas gruesas:** Minimo 2mm para 5A, usar cobre externo e interno
+### Proteccion de Entrada
+- **PPTC F1:** Se abre a 5A, protege contra cortocircuito
+- **Diodo Schottky D1:** Previene dano por polaridad inversa
+- **Capacitor C1:** 100uF/50V electrolitico para filtro de entrada
+
+### Proteccion de Salida (Fase 17)
+- **PPTC F2:** 5.5A reseteable en salida CH1
+- **PPTC F3:** 5.5A reseteable en salida CH2
+- **Diodos Schottky:** Proteccion contra sobrevoltaje transitorio
+
+### Relés
+- **Galvanicamente separados** del MCU via optoacopladores
+- **Bobinas a 12V** con transistor driver (2N3904)
+- **Flyback diodes:** 1N4148 en paralelo con cada bobina
+
+### Separacion de Suelos (GND)
+- **GND de potencia:** Separado fisicamente del GND del MCU
+- **Conexion:** Un solo punto (estrella) en el GND del MCU
+- **Pistas de GND:** Minimo 4mm para corrientes de hasta 5A
+
+### Ancho de Pistas de Cobre (Fase 17)
+
+#### Calculo para 5A con Cobre de 1oz (35um):
+
+Segun IPC-2152 (estandar para ancho de pista):
+
+| Corriente | Ancho min (1oz) | Ancho recomendado |
+|-----------|-----------------|-------------------|
+| 1A        | 0.3mm           | 0.5mm             |
+| 2A        | 0.6mm           | 1.0mm             |
+| 3A        | 1.0mm           | 1.5mm             |
+| 5A        | 1.5mm           | 2.0mm             |
+| 10A       | 3.0mm           | 4.0mm             |
+
+**Para nuestro diseno (5A):**
+- **Ancho minimo de pista:** 2.0mm (1oz cobre)
+- **Ancho recomendado:** 2.5mm (margen de seguridad)
+- **Para pistas de 10A (modo paralelo):** 4.0mm
+
+#### Verificacion Termica:
+```
+Resistencia de pista (R):
+  R = (L / W) * (rho / t)
+
+Donde:
+  L = longitud de pista (mm)
+  W = ancho de pista (mm)
+  rho = resistividad del cobre (1.72e-8 ohm*m)
+  t = espesor del cobre (35um = 35e-6 m)
+
+Para W = 2mm, L = 50mm, 1oz cobre:
+  R = (50 / 2) * (1.72e-8 / 35e-6) = 0.0123 ohm
+
+Caída de voltaje a 5A:
+  Vdrop = I * R = 5 * 0.0123 = 0.061V (aceptable)
+```
+
+### Disipador de Calor (Fase 17)
+
+#### Especificacion para XL4015:
+- **Potencia maxima disipada:** ~5W (a 30V/5A con entrada 36V)
+- **Rth(j-c):** 3.5°C/W (jalón termico junction-case)
+- **Rth(c-a):** 40°C/W (sin disipador)
+
+#### Calculo del Disipador:
+```
+Temp maxima junction: 125°C
+Temp ambiente: 25°C
+Disipacion: 5W
+
+Rth total necesario = (125 - 25) / 5 = 20°C/W
+
+Sin disipador: 3.5 + 40 = 43.5°C/W (INSUFICIENTE)
+Con disipador: 3.5 + Rth_disipador = 20°C/W
+Rth_disipador = 16.5°C/W
+
+Disipador recomendado: TO-220 clip-on, Rth < 15°C/W
+```
+
+### Componentes Adicionales Fase 17
+| Ref | Componente | Cantidad | Valor | Notas |
+|-----|------------|----------|-------|-------|
+| F2  | PPTC       | 1        | 5.5A  | Proteccion salida CH1 |
+| F3  | PPTC       | 1        | 5.5A  | Proteccion salida CH2 |
+| D_fly1 | 1N4148  | 1        | -     | Flyback rele 1 |
+| D_fly2 | 1N4148  | 1        | -     | Flyback rele 2 |
+| HS1 | Disipador  | 1        | TO-220 | Para XL4015 |

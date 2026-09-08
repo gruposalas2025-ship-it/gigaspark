@@ -1,7 +1,7 @@
 /*
- * Gigaspark OS - zRAM Compression Header
- * Simple RLE (Run-Length Encoding) compressor/decompressor
- * No external dependencies, pure C, designed for embedded.
+ * Gigaspark OS - zRAM Compression Header (Fase 16: LRU)
+ * Compresion RLE con politica de eviccion LRU.
+ * Sin dependencias externas, C puro, optimizado para embedded.
  */
 
 #ifndef GIGASPARK_ZRAM_COMP_H
@@ -11,33 +11,71 @@
 #include <stddef.h>
 
 /*
- * Compress data using RLE encoding.
+ * Comprime datos usando RLE.
  *
- * Format: [count][byte] pairs. count is 1-255.
- * If a run exceeds 255, it is split into multiple pairs.
- * Literal (non-repeated) bytes are stored as [1][byte].
+ * Formato: pares [count][byte]. count es 1-255.
+ * Si un run excede 255, se divide en multiples pares.
+ * Bytes no repetidos se almacenan como [1][byte].
  *
- * @param src       Source data to compress.
- * @param src_len   Length of source data in bytes.
- * @param dst       Destination buffer for compressed data.
- * @param dst_len   Size of destination buffer in bytes.
- * @return          Number of bytes written to dst, or 0 on error
- *                  (dst buffer too small).
+ * @param src       Datos a comprimir.
+ * @param src_len   Longitud de datos fuente.
+ * @param dst       Buffer de salida para datos comprimidos.
+ * @param dst_len   Tamano del buffer de salida.
+ * @return          Bytes escritos en dst, o 0 si falla.
  */
 size_t zram_compress(const uint8_t *src, size_t src_len,
 		     uint8_t *dst, size_t dst_len);
 
 /*
- * Decompress RLE-encoded data.
+ * Descomprime datos codificados en RLE.
  *
- * @param src       Compressed data.
- * @param src_len   Length of compressed data in bytes.
- * @param dst       Destination buffer for decompressed data.
- * @param dst_len   Size of destination buffer in bytes.
- * @return          Number of bytes written to dst, or 0 on error
- *                  (dst buffer too small or corrupt data).
+ * @param src       Datos comprimidos.
+ * @param src_len   Longitud de datos comprimidos.
+ * @param dst       Buffer de salida para datos descomprimidos.
+ * @param dst_len   Tamano del buffer de salida.
+ * @return          Bytes escritos en dst, o 0 si falla.
  */
 size_t zram_decompress(const uint8_t *src, size_t src_len,
 		       uint8_t *dst, size_t dst_len);
+
+/*
+ * Comprime y almacena un bloque en la tabla LRU.
+ * Si la tabla esta llena, expulsa la victima LRU.
+ *
+ * @param handle    Handle del bloque a comprimir.
+ * @param src       Datos fuente.
+ * @param src_len   Longitud de datos fuente.
+ * @return          Tamano comprimido, o 0 si falla.
+ */
+size_t zram_compress_and_store(uint32_t handle,
+			       const uint8_t *src, size_t src_len);
+
+/*
+ * Recupera y descomprime un bloque de la tabla LRU.
+ * Actualiza el timestamp LRU del bloque.
+ *
+ * @param handle    Handle del bloque a recuperar.
+ * @param dst       Buffer de salida.
+ * @param dst_len   Tamano del buffer de salida.
+ * @return          Tamano descomprimido, o 0 si no existe.
+ */
+size_t zram_retrieve(uint32_t handle, uint8_t *dst, size_t dst_len);
+
+/*
+ * Expulsa explicitamente un bloque del zRAM.
+ *
+ * @param handle    Handle del bloque a expulsar.
+ * @return          Handle expulsado, o 0 si no existia.
+ */
+uint32_t zram_evict_block(uint32_t handle);
+
+/*
+ * Retorna estadisticas del zRAM.
+ *
+ * @param used      Puntero para bloques en uso (o NULL).
+ * @param total     Puntero para bloques totales (o NULL).
+ * @param counter   Puntero para contador LRU global (o NULL).
+ */
+void zram_get_stats(uint8_t *used, uint8_t *total, uint32_t *counter);
 
 #endif /* GIGASPARK_ZRAM_COMP_H */

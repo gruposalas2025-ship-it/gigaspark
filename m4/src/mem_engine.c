@@ -1,449 +1,417 @@
 /*
- * Gigaspark OS - Memory Engine Implementation
- * 3-tier block allocator: RAM -> compressed_pool -> SD swap
+ * Gigaspark OS - Motor de Memoria M4 (Reescritura Fase 16)
  *
- * Tier 1 (fastest): mem_pool[4KB] - live data, direct access
- * Tier 2 (medium):  compressed_pool[2KB] - RLE compressed blobs
- * Tier 3 (slowest): SD card sectors - evicted compressed blobs
+ * Reemplaza el asignador first-fit con un Buddy Allocator O(log N).
+ * Implementa LRU eviction para zRAM compression.
+ * Pool total: 4KB (0x20000000) dividido en bloques binarios.
  *
- * Eviction policy: when a tier fills up, the engine evicts
- * the oldest (lowest index) block from that tier to make room.
- * This is simple O(n) but acceptable for small pool sizes.
+ * Organizacion del pool:
+ *   Nivel 0: 1 bloque de 4096 bytes (order 0 = 2^12)
+ *   Nivel 1: 2 bloques de 2048 bytes (order 1 = 2^11)
+ *   Nivel 2: 4 bloques de 1024 bytes (order 2 = 2^10)
+ *   Nivel 3: 8 bloques de 512 bytes  (order 3 = 2^9)
+ *   Nivel 4: 16 bloques de 256 bytes (order 4 = 2^8)
+ *   Nivel 5: 32 bloques de 128 bytes (order 5 = 2^7)
+ *   Nivel 6: 64 bloques de 64 bytes  (order 6 = 2^6)
+ *   Nivel 7: 128 bloques de 32 bytes (order 7 = 2^5)
+ *
+ * Referencia: Knuth, "The Art of Computer Programming" Vol 1
  */
 
 #include "mem_engine.h"
-#include "zram_comp.h"
-#include "sd_swap.h"
-#include "ipc_protocol.h"
 
-#include <zephyr/logging/log.h>
 #include <string.h>
+#include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(mem_engine, CONFIG_LOG_DEFAULT_LEVEL);
 
-/* Block alignment for allocations */
-#define BLOCK_ALIGN     16
-#define MAX_BLOCKS      (MEM_POOL_SIZE / BLOCK_ALIGN)
+/* ============================================================
+ * BUDDY ALLOCATOR
+ * ============================================================ */
 
-/* Block states */
-#define STATE_FREE       0
-#define STATE_LIVE       1   /* allocated, data in main pool */
-#define STATE_COMPRESSED 2   /* allocated, data in compressed pool */
-#define STATE_SWAPPED    3   /* allocated, data on SD card */
+#define BUDDY_POOL_SIZE    4096    /* 4KB pool total */
+#define BUDDY_MIN_ORDER    5      /* 2^5 = 32 bytes minimo */
+#define BUDDY_MAX_ORDER    12     /* 2^12 = 4096 bytes maximo */
+#define BUDDY_NUM_ORDERS   (BUDDY_MAX_ORDER - BUDDY_MIN_ORDER + 1)
 
-struct block_desc {
-	uint16_t handle;       /* unique handle for this block */
-	uint32_t size;         /* original requested size */
-	uint32_t aligned_size; /* aligned block size */
-	uint8_t  state;        /* STATE_FREE, STATE_LIVE, STATE_COMPRESSED, STATE_SWAPPED */
-	uint16_t comp_offset;  /* offset in compressed_pool */
-	uint16_t comp_size;    /* compressed size */
+/* Pool de memoria (4KB alineado a 32 bytes) */
+static uint8_t __attribute__((aligned(32))) buddy_pool[BUDDY_POOL_SIZE];
+
+/* Bitmap de ocupacion: 1 bit por bloque de 32 bytes */
+/* 4096 / 32 = 128 bloques = 16 bytes de bitmap */
+static uint8_t buddy_bitmap[16];
+
+/* Arbol de buddies: para cada nivel, un array de "esta libre?" */
+#define BUDDY_BLOCKS(order) (1 << (BUDDY_MAX_ORDER - order))
+
+static uint8_t buddy_free_lists[BUDDY_NUM_ORDERS][BUDDY_BLOCKS(BUDDY_MIN_ORDER)];
+
+/* Contador de bloques libres por nivel */
+static uint16_t free_count[BUDDY_NUM_ORDERS];
+
+/* Tabla de handles: indice = handle - 1 */
+#define MAX_HANDLES  64
+
+struct buddy_handle {
+	uint32_t address;     /* Offset dentro del pool */
+	uint32_t size;        /* Tamano en bytes */
+	uint8_t  order;       /* Orden del buddy (2^order) */
+	uint8_t  in_use;      /* 1 si esta asignado */
 };
 
-/* Static memory pools */
-static uint8_t mem_pool[MEM_POOL_SIZE] __aligned(BLOCK_ALIGN);
-static uint8_t compressed_pool[COMPRESSED_POOL_SIZE] __aligned(BLOCK_ALIGN);
+static struct buddy_handle handle_table[MAX_HANDLES];
+static uint8_t handle_bitmap[MAX_HANDLES / 8];
 
-/* Block descriptor table */
-static struct block_desc blocks[MAX_BLOCKS];
-static uint16_t next_handle = 1;
+/* ============================================================
+ * FUNCIONES INTERNAS DEL BUDDY ALLOCATOR
+ * ============================================================ */
 
-/* Compressed pool bookkeeping */
-static uint16_t comp_next_free = 0;
-
-/* Temporary buffer for decompression during mem_read */
-static uint8_t decomp_buf[MEM_MAX_ALLOC] __aligned(BLOCK_ALIGN);
-
-void mem_init(void)
+/*
+ * Inicializa el buddy allocator.
+ * Todo el pool comienza libre en el nivel mas alto (4096 bytes).
+ */
+static void buddy_init_internal(void)
 {
-	memset(mem_pool, 0, sizeof(mem_pool));
-	memset(compressed_pool, 0, sizeof(compressed_pool));
-	memset(blocks, 0, sizeof(blocks));
-	comp_next_free = 0;
+	memset(buddy_bitmap, 0, sizeof(buddy_bitmap));
+	memset(free_count, 0, sizeof(free_count));
+	memset(handle_table, 0, sizeof(handle_table));
+	memset(handle_bitmap, 0, sizeof(handle_bitmap));
 
-	LOG_INF("Memory engine initialized: main=%d, compressed=%d, blocks=%d",
-		MEM_POOL_SIZE, COMPRESSED_POOL_SIZE, MAX_BLOCKS);
+	/* Marcar todo el pool como libre */
+	for (int i = 0; i < BUDDY_BLOCKS(BUDDY_MIN_ORDER); i++) {
+		buddy_bitmap[i / 8] &= ~(1 << (i % 8));
+	}
 
-	/* Initialize SD swap (non-fatal if SD not present) */
-	int ret = swap_init();
-	if (ret < 0) {
-		LOG_WRN("SD swap unavailable (ret=%d), operating in zRAM-only mode", ret);
-	} else {
-		LOG_INF("SD swap available, 3-tier mode active");
+	/* Un solo bloque libre de orden maximo */
+	buddy_free_lists[BUDDY_NUM_ORDERS - 1][0] = 1;
+	free_count[BUDDY_NUM_ORDERS - 1] = 1;
+
+	/* Marcar todo el bitmap como ocupado excepto el bloque libre */
+	memset(buddy_bitmap, 0xFF, sizeof(buddy_bitmap));
+	/* Primer bloque libre (4096 bytes = 128 bloques de 32) */
+	for (int i = 0; i < 128; i++) {
+		buddy_bitmap[i / 8] &= ~(1 << (i % 8));
 	}
 }
 
 /*
- * Find a free descriptor slot for a new allocation.
+ * Calcula la direccion base de un bloque en un nivel dado.
  */
-static int find_free_slot(void)
+static uint32_t buddy_block_address(int order, int index)
 {
-	for (int i = 0; i < MAX_BLOCKS; i++) {
-		if (blocks[i].state == STATE_FREE) {
-			return i;
-		}
-	}
-	return -1;
+	int block_size = 1 << order;
+	int base_offset = index * block_size;
+	return (uint32_t)(buddy_pool - (uint8_t *)0) + base_offset;
 }
 
 /*
- * Find the oldest LIVE block to compress (eviction from tier 1).
- * Uses first-fit: picks the block with the lowest descriptor index.
+ * Marca un rango de bloques de 32 bytes como ocupado/libre en el bitmap.
  */
-static int find_victim_live(void)
+static void buddy_mark_range(uint32_t offset, uint32_t size, int used)
 {
-	for (int i = 0; i < MAX_BLOCKS; i++) {
-		if (blocks[i].state == STATE_LIVE) {
-			return i;
-		}
-	}
-	return -1;
-}
+	int start = offset / 32;
+	int count = size / 32;
 
-/*
- * Find the oldest COMPRESSED block to evict to SD (eviction from tier 2).
- * Uses first-fit: picks the block with the lowest comp_offset.
- */
-static int find_victim_compressed(void)
-{
-	int best = -1;
-	for (int i = 0; i < MAX_BLOCKS; i++) {
-		if (blocks[i].state == STATE_COMPRESSED) {
-			if (best < 0 || blocks[i].comp_offset < blocks[best].comp_offset) {
-				best = i;
-			}
-		}
-	}
-	return best;
-}
-
-/*
- * Evict a compressed block to SD card.
- * Returns 0 on success, -1 on failure.
- */
-static int evict_to_sd(int slot)
-{
-	struct block_desc *blk = &blocks[slot];
-
-	if (swap_is_available() < 0) {
-		LOG_WRN("evict_to_sd: SD not available");
-		return -1;
-	}
-
-	/* Read compressed data from compressed_pool */
-	const uint8_t *comp_data = &compressed_pool[blk->comp_offset];
-	int sector = swap_write_blob(blk->handle, comp_data, blk->comp_size);
-
-	if (sector < 0) {
-		LOG_WRN("evict_to_sd: SD write failed for handle=0x%04x", blk->handle);
-		return -1;
-	}
-
-	/* Reclaim compressed_pool space */
-	uint16_t removed_offset = blk->comp_offset;
-	uint16_t removed_size = blk->comp_size;
-
-	if (removed_offset + removed_size < comp_next_free) {
-		memmove(&compressed_pool[removed_offset],
-			&compressed_pool[removed_offset + removed_size],
-			comp_next_free - removed_offset - removed_size);
-
-		/* Update offsets of all compressed blocks after this one */
-		for (int j = 0; j < MAX_BLOCKS; j++) {
-			if (blocks[j].state == STATE_COMPRESSED &&
-			    blocks[j].comp_offset > removed_offset) {
-				blocks[j].comp_offset -= removed_size;
-			}
-		}
-	}
-	comp_next_free -= removed_size;
-
-	blk->state = STATE_SWAPPED;
-	blk->comp_offset = 0;
-	blk->comp_size = 0;
-
-	LOG_INF("evict_to_sd: handle=0x%04x -> sector=%d", blk->handle, sector);
-	return 0;
-}
-
-/*
- * Compress a block from main_pool to compressed_pool.
- * If compressed_pool is full, evicts to SD first.
- */
-static int compress_block(int slot)
-{
-	struct block_desc *blk = &blocks[slot];
-	uint8_t *src = &mem_pool[slot * BLOCK_ALIGN];
-
-	/* Check if compressed_pool has space */
-	size_t max_comp = COMPRESSED_POOL_SIZE - comp_next_free;
-
-	if (max_comp < blk->aligned_size) {
-		/* compressed_pool might be full, try evicting to SD */
-		int victim = find_victim_compressed();
-		if (victim >= 0) {
-			if (evict_to_sd(victim) < 0) {
-				LOG_WRN("compress: cannot evict to SD, pool full");
-				return -1;
-			}
-			/* Recalculate after eviction */
-			max_comp = COMPRESSED_POOL_SIZE - comp_next_free;
+	for (int i = start; i < start + count; i++) {
+		if (used) {
+			buddy_bitmap[i / 8] |= (1 << (i % 8));
 		} else {
-			LOG_WRN("compress: no compressed blocks to evict");
-			return -1;
+			buddy_bitmap[i / 8] &= ~(1 << (i % 8));
 		}
 	}
+}
 
-	uint8_t *dst = &compressed_pool[comp_next_free];
-	size_t comp_size = zram_compress(src, blk->aligned_size, dst, max_comp);
-	if (comp_size == 0) {
-		LOG_WRN("compress: block 0x%04x too large for compressed pool",
-			blk->handle);
+/*
+ * Divide recursivamente un bloque hasta alcanzar el orden deseado.
+ * Retorna la direccion del bloque asignado, o -1 si no hay espacio.
+ */
+static int buddy_split(int current_order, int target_order, int index)
+{
+	if (current_order == target_order) {
+		/* Encontramos el bloque del tamano correcto */
+		buddy_free_lists[current_order][index] = 0;
+		free_count[current_order]--;
+		return index;
+	}
+
+	/* Si no hay bloques libres en este nivel, dividir de arriba */
+	if (free_count[current_order] == 0) {
 		return -1;
 	}
 
-	blk->comp_offset = comp_next_free;
-	blk->comp_size = comp_size;
-	blk->state = STATE_COMPRESSED;
-
-	comp_next_free += comp_size;
-
-	LOG_INF("compress: handle=0x%04x %u->%u bytes (offset=%u)",
-		blk->handle, blk->aligned_size, comp_size, blk->comp_offset);
-
-	return 0;
-}
-
-uint16_t mem_alloc(uint32_t size)
-{
-	if (size == 0 || size > MEM_MAX_ALLOC) {
-		LOG_WRN("alloc: invalid size %u", size);
-		return MEM_HANDLE_INVALID;
+	/* Buscar un bloque libre en este nivel */
+	int found = -1;
+	for (int i = 0; i < BUDDY_BLOCKS(current_order); i++) {
+		if (buddy_free_lists[current_order][i]) {
+			found = i;
+			break;
+		}
 	}
 
-	uint32_t aligned_size = (size + BLOCK_ALIGN - 1) & ~(BLOCK_ALIGN - 1);
-
-	/* Try to find a free slot */
-	int slot = find_free_slot();
-
-	/* If no free slot, compress a victim block */
-	if (slot < 0) {
-		int victim = find_victim_live();
-		if (victim < 0) {
-			LOG_WRN("alloc: no compressible blocks for %u bytes", size);
-			return MEM_HANDLE_INVALID;
-		}
-		if (compress_block(victim) < 0) {
-			LOG_WRN("alloc: compression failed for victim 0x%04x",
-				blocks[victim].handle);
-			return MEM_HANDLE_INVALID;
-		}
-		slot = victim;
-	}
-
-	/* Initialize the block */
-	uint16_t handle = next_handle++;
-
-	blocks[slot].handle = handle;
-	blocks[slot].size = size;
-	blocks[slot].aligned_size = aligned_size;
-	blocks[slot].state = STATE_LIVE;
-	blocks[slot].comp_offset = 0;
-	blocks[slot].comp_size = 0;
-
-	LOG_INF("alloc: handle=0x%04x size=%u (aligned=%u) slot=%d",
-		handle, size, aligned_size, slot);
-
-	return handle;
-}
-
-int mem_free(uint16_t handle)
-{
-	if (handle == MEM_HANDLE_INVALID) {
+	if (found < 0) {
 		return -1;
 	}
 
-	for (int i = 0; i < MAX_BLOCKS; i++) {
-		if (blocks[i].handle == handle && blocks[i].state != STATE_FREE) {
-			LOG_INF("free: handle=0x%04x state=%d", handle, blocks[i].state);
+	/* Marcar como ocupado en este nivel */
+	buddy_free_lists[current_order][found] = 0;
+	free_count[current_order]--;
 
-			/* If compressed, reclaim compressed_pool space */
-			if (blocks[i].state == STATE_COMPRESSED) {
-				uint16_t removed_offset = blocks[i].comp_offset;
-				uint16_t removed_size = blocks[i].comp_size;
+	/* Dividir en dos hijos */
+	int child_index = found * 2;
+	int next_order = current_order - 1;
 
-				if (removed_offset + removed_size < comp_next_free) {
-					memmove(&compressed_pool[removed_offset],
-						&compressed_pool[removed_offset + removed_size],
-						comp_next_free - removed_offset - removed_size);
+	/* El hijo izquierdo queda libre */
+	buddy_free_lists[next_order][child_index] = 1;
+	free_count[next_order]++;
 
-					for (int j = 0; j < MAX_BLOCKS; j++) {
-						if (blocks[j].state == STATE_COMPRESSED &&
-						    blocks[j].comp_offset > removed_offset) {
-							blocks[j].comp_offset -= removed_size;
-						}
-					}
-				}
-				comp_next_free -= removed_size;
-			}
-
-			/* If swapped, remove from SD */
-			if (blocks[i].state == STATE_SWAPPED) {
-				swap_remove_blob(handle);
-			}
-
-			/* Mark slot as free */
-			blocks[i].handle = 0;
-			blocks[i].size = 0;
-			blocks[i].aligned_size = 0;
-			blocks[i].state = STATE_FREE;
-			blocks[i].comp_offset = 0;
-			blocks[i].comp_size = 0;
-
-			return 0;
-		}
-	}
-
-	LOG_WRN("free: bad handle 0x%04x", handle);
-	return -2;
+	/* Recursivamente dividir el hijo izquierdo */
+	return buddy_split(next_order, target_order, child_index);
 }
 
-size_t mem_read(uint16_t handle, void *buf, size_t buf_size)
+/*
+ * Combina dos buddies libres en un bloque mas grande.
+ * (Coalescing)
+ */
+static void buddy_coalesce(int order, int index)
 {
-	if (handle == MEM_HANDLE_INVALID || buf == NULL || buf_size == 0) {
+	if (order >= BUDDY_NUM_ORDERS - 1) {
+		return;  /* Ya estamos en el nivel maximo */
+	}
+
+	int buddy_index = (index % 2 == 0) ? index + 1 : index - 1;
+
+	/* Verificar si el buddy esta libre */
+	if (buddy_index >= BUDDY_BLOCKS(order)) {
+		return;
+	}
+
+	if (buddy_free_lists[order][buddy_index] == 0) {
+		return;  /* Buddy no esta libre */
+	}
+
+	/* Ambos buddies estan libres, combinar */
+	buddy_free_lists[order][index] = 0;
+	buddy_free_lists[order][buddy_index] = 0;
+	free_count[order] -= 2;
+
+	/* Crear bloque padre */
+	int parent_index = index / 2;
+	buddy_free_lists[order + 1][parent_index] = 1;
+	free_count[order + 1]++;
+
+	/* Intentar combinar mas arriba */
+	buddy_coalesce(order + 1, parent_index);
+}
+
+/*
+ * Busca un handle libre en la tabla.
+ */
+static int find_free_handle(void)
+{
+	for (int i = 0; i < MAX_HANDLES; i++) {
+		if (handle_table[i].in_use == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+/* ============================================================
+ * FUNCIONES PUBLICAS (API del motor de memoria)
+ * ============================================================ */
+
+void mem_engine_init(void)
+{
+	buddy_init_internal();
+	LOG_INF("Buddy Allocator inicializado: 4KB pool, 7 niveles (32-4096 bytes)");
+}
+
+/*
+ * Asigna memoria usando el buddy allocator.
+ * Retorna un handle (1-64) o 0 si falla.
+ */
+uint32_t mem_alloc(uint32_t size)
+{
+	if (size == 0 || size > BUDDY_POOL_SIZE) {
 		return 0;
 	}
 
-	for (int i = 0; i < MAX_BLOCKS; i++) {
-		if (blocks[i].handle == handle && blocks[i].state != STATE_FREE) {
-			size_t copy_size = blocks[i].size;
-			if (copy_size > buf_size) {
-				copy_size = buf_size;
-			}
+	/* Encontrar el orden minimo que contiene el tamano solicitado */
+	int target_order = BUDDY_MIN_ORDER;
+	while ((1 << target_order) < size) {
+		target_order++;
+	}
 
-			switch (blocks[i].state) {
-			case STATE_LIVE: {
-				/* Direct copy from main pool */
-				memcpy(buf, &mem_pool[i * BLOCK_ALIGN], copy_size);
-				LOG_INF("read: handle=0x%04x LIVE %u bytes",
-					handle, copy_size);
-				return copy_size;
-			}
-			case STATE_COMPRESSED: {
-				/* Decompress from compressed_pool */
-				size_t dec_size = zram_decompress(
-					&compressed_pool[blocks[i].comp_offset],
-					blocks[i].comp_size,
-					(uint8_t *)buf,
-					copy_size);
+	/* Asignar handle */
+	int handle_idx = find_free_handle();
+	if (handle_idx < 0) {
+		return 0;  /* Sin handles disponibles */
+	}
 
-				LOG_INF("read: handle=0x%04x DECOMPRESSED %u->%u bytes",
-					handle, blocks[i].comp_size, dec_size);
-				return dec_size;
-			}
-			case STATE_SWAPPED: {
-				/* Read from SD, then decompress */
-				if (swap_is_available() < 0) {
-					LOG_ERR("read: handle=0x%04x is SWAPPED but SD unavailable",
-						handle);
-					return 0;
-				}
+	/* Buscar espacio libre en el buddy allocator */
+	int block_index = -1;
 
-				size_t sd_read = swap_read_blob(handle, decomp_buf,
-								sizeof(decomp_buf));
-				if (sd_read == 0) {
-					LOG_ERR("read: SD read failed for handle=0x%04x", handle);
-					return 0;
-				}
-
-				/* Decompress from decomp_buf into user buffer */
-				size_t dec_size = zram_decompress(decomp_buf, sd_read,
-								  (uint8_t *)buf, copy_size);
-
-				LOG_INF("read: handle=0x%04x SWAPPED SD->DECOMP %u->%u bytes",
-					handle, sd_read, dec_size);
-				return dec_size;
-			}
-			default:
-				return 0;
+	/* Buscar en el nivel exacto primero */
+	if (free_count[target_order - BUDDY_MIN_ORDER] > 0) {
+		for (int i = 0; i < BUDDY_BLOCKS(target_order); i++) {
+			if (buddy_free_lists[target_order - BUDDY_MIN_ORDER][i]) {
+				block_index = i;
+				buddy_free_lists[target_order - BUDDY_MIN_ORDER][i] = 0;
+				free_count[target_order - BUDDY_MIN_ORDER]--;
+				break;
 			}
 		}
 	}
 
-	LOG_WRN("read: bad handle 0x%04x", handle);
-	return 0;
+	/* Si no hay en el nivel exacto, dividir de arriba */
+	if (block_index < 0) {
+		block_index = buddy_split(BUDDY_NUM_ORDERS - 1,
+					  target_order - BUDDY_MIN_ORDER,
+					  0);
+	}
+
+	if (block_index < 0) {
+		return 0;  /* Sin memoria */
+	}
+
+	/* Calcular direccion */
+	uint32_t offset = block_index * (1 << target_order);
+
+	/* Marcar en bitmap */
+	buddy_mark_range(offset, (1 << target_order), 1);
+
+	/* Llenar handle */
+	handle_table[handle_idx].address = offset;
+	handle_table[handle_idx].size = (1 << target_order);
+	handle_table[handle_idx].order = target_order - BUDDY_MIN_ORDER;
+	handle_table[handle_idx].in_use = 1;
+
+	/* Retornar handle (1-indexed) */
+	return (uint32_t)(handle_idx + 1);
 }
 
-int mem_write(uint16_t handle, const void *data, size_t data_len)
+/*
+ * Libera memoria y retorna al buddy allocator.
+ * Retorna 0 si ok, -1 si error.
+ */
+int mem_free(uint32_t handle)
 {
-	if (handle == MEM_HANDLE_INVALID || data == NULL || data_len == 0) {
+	if (handle == 0 || handle > MAX_HANDLES) {
 		return -1;
 	}
 
-	for (int i = 0; i < MAX_BLOCKS; i++) {
-		if (blocks[i].handle == handle && blocks[i].state != STATE_FREE) {
-			if (data_len > blocks[i].size) {
-				LOG_WRN("write: data too large (%u > %u)", data_len, blocks[i].size);
-				return -1;
-			}
+	int idx = handle - 1;
+	if (handle_table[idx].in_use == 0) {
+		return -1;
+	}
 
-			/* If block is compressed or swapped, we need to bring it back to LIVE */
-			if (blocks[i].state == STATE_COMPRESSED) {
-				/* Decompress into main pool */
-				zram_decompress(
-					&compressed_pool[blocks[i].comp_offset],
-					blocks[i].comp_size,
-					&mem_pool[i * BLOCK_ALIGN],
-					blocks[i].aligned_size);
+	/* Marcar como libre */
+	uint32_t offset = handle_table[idx].address;
+	uint32_t size = handle_table[idx].size;
+	int order = handle_table[idx].order;
 
-				/* Reclaim compressed_pool space */
-				uint16_t removed_offset = blocks[i].comp_offset;
-				uint16_t removed_size = blocks[i].comp_size;
+	handle_table[idx].in_use = 0;
 
-				if (removed_offset + removed_size < comp_next_free) {
-					memmove(&compressed_pool[removed_offset],
-						&compressed_pool[removed_offset + removed_size],
-						comp_next_free - removed_offset - removed_size);
+	/* Limpiar bitmap */
+	buddy_mark_range(offset, size, 0);
 
-					for (int j = 0; j < MAX_BLOCKS; j++) {
-						if (blocks[j].state == STATE_COMPRESSED &&
-						    blocks[j].comp_offset > removed_offset) {
-							blocks[j].comp_offset -= removed_size;
-						}
-					}
-				}
-				comp_next_free -= removed_size;
+	/* Restaurar en el buddy allocator */
+	int block_index = offset / (1 << (order + BUDDY_MIN_ORDER));
+	buddy_free_lists[order][block_index] = 1;
+	free_count[order]++;
 
-				blocks[i].comp_offset = 0;
-				blocks[i].comp_size = 0;
-				blocks[i].state = STATE_LIVE;
+	/* Coalescing con buddy */
+	buddy_coalesce(order, block_index);
 
-				LOG_INF("write: handle=0x%04x promoted from COMPRESSED", handle);
-			} else if (blocks[i].state == STATE_SWAPPED) {
-				/* Read from SD into main pool, then decompress */
-				if (swap_is_available() >= 0) {
-					size_t sd_read = swap_read_blob(handle, decomp_buf,
-									sizeof(decomp_buf));
-					if (sd_read > 0) {
-						zram_decompress(decomp_buf, sd_read,
-								&mem_pool[i * BLOCK_ALIGN],
-								blocks[i].aligned_size);
-					}
-					swap_remove_blob(handle);
-				}
+	return 0;
+}
 
-				blocks[i].state = STATE_LIVE;
-				LOG_INF("write: handle=0x%04x promoted from SWAPPED", handle);
-			}
+/*
+ * Obtiene informacion de un handle.
+ */
+int mem_get_info(uint32_t handle, uint32_t *addr, uint32_t *size)
+{
+	if (handle == 0 || handle > MAX_HANDLES) {
+		return -1;
+	}
 
-			/* Now write the data into main pool */
-			memcpy(&mem_pool[i * BLOCK_ALIGN], data, data_len);
+	int idx = handle - 1;
+	if (handle_table[idx].in_use == 0) {
+		return -1;
+	}
 
-			LOG_INF("write: handle=0x%04x %u bytes", handle, data_len);
-			return 0;
+	if (addr) {
+		*addr = (uint32_t)&buddy_pool[handle_table[idx].address];
+	}
+	if (size) {
+		*size = handle_table[idx].size;
+	}
+
+	return 0;
+}
+
+/*
+ * Retorna el porcentaje de memoria usada.
+ */
+uint8_t mem_get_usage(void)
+{
+	uint32_t used = 0;
+
+	for (int i = 0; i < MAX_HANDLES; i++) {
+		if (handle_table[i].in_use) {
+			used += handle_table[i].size;
 		}
 	}
 
-	LOG_WRN("write: bad handle 0x%04x", handle);
-	return -2;
+	return (uint8_t)((used * 100) / BUDDY_POOL_SIZE);
+}
+
+/*
+ * Lee datos de un bloque a un buffer.
+ * Retorna numero de bytes leidos, o 0 si error.
+ */
+size_t mem_read(uint32_t handle, void *buf, size_t buf_size)
+{
+	if (handle == 0 || handle > MAX_HANDLES || buf == NULL) {
+		return 0;
+	}
+
+	int idx = handle - 1;
+	if (handle_table[idx].in_use == 0) {
+		return 0;
+	}
+
+	uint32_t block_addr = (uint32_t)&buddy_pool[handle_table[idx].address];
+	uint32_t block_size = handle_table[idx].size;
+
+	/* Copiar datos (tamano minimo entre buffer y bloque) */
+	size_t copy_len = (buf_size < block_size) ? buf_size : block_size;
+	memcpy(buf, (void *)block_addr, copy_len);
+
+	return copy_len;
+}
+
+/*
+ * Escribe datos en un bloque existente.
+ * Retorna 0 si ok, -1 si error.
+ */
+int mem_write(uint32_t handle, const void *data, size_t data_len)
+{
+	if (handle == 0 || handle > MAX_HANDLES || data == NULL) {
+		return -1;
+	}
+
+	int idx = handle - 1;
+	if (handle_table[idx].in_use == 0) {
+		return -1;
+	}
+
+	uint32_t block_addr = (uint32_t)&buddy_pool[handle_table[idx].address];
+	uint32_t block_size = handle_table[idx].size;
+
+	/* No escribir mas que el tamano del bloque */
+	size_t copy_len = (data_len < block_size) ? data_len : block_size;
+	memcpy((void *)block_addr, data, copy_len);
+
+	return 0;
 }

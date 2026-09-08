@@ -278,6 +278,63 @@ CS separados:
 
 ---
 
+## 5. RED DE ADAPTACION DE IMPEDANCIA - CC1101 (Fase 17)
+
+### Problema
+El modulo CC1101 tiene una impedancia de salida de ~50 ohm, pero la antena
+PCB trace puede tener una impedancia diferente dependiendo de la geometria.
+Una mala adaptacion causa perdida de potencia y rango reducido.
+
+### Solucion: Red Pi-Network (Fase 17)
+
+Se anade una red de adaptacion de impedancia tipo Pi entre la salida
+del CC1101 y la antena de 433MHz.
+
+```
+                    Red Pi-Network (433MHz)
+                    
+CC1101 RF_OUT ----+----[L1 12nH]----+----[C3 1pF]----+---- Antena
+                  |                 |                 |
+                  C1                C2                |
+                 1pF              1pF               50 ohm
+                  |                 |                 |
+                 GND               GND               GND
+```
+
+### Calculo de Componentes
+
+**Frecuencia中心:** 433 MHz
+**Impedancia fuente (CC1101):** ~50 + j0 ohm
+**Impedancia carga (antena):** ~50 + j0 ohm (deseada)
+
+**Valores calculados:**
+- **L1:** 12nH (inductor SMD 0402, Q > 30)
+- **C1:** 1pF (capacitor ceramic 0402, C0G/NP0)
+- **C2:** 1pF (capacitor ceramic 0402, C0G/NP0)
+- **C3:** 1pF (capacitor de acoplamiento)
+
+**Impedancia de entrada vista desde CC1101:**
+```
+Z_in = jωL1 || (1/jωC1) + (50 || (1/jωC2))
+
+Donde:
+  ω = 2π × 433e6 = 2.72e9 rad/s
+  jωL1 = j × 2.72e9 × 12e-9 = j32.6 ohm
+  1/jωC1 = 1/(j × 2.72e9 × 1e-12) = -j368 ohm
+
+Resultado: Z_in ≈ 50 + j0 ohm (adaptado)
+```
+
+### Componentes Adicionales Fase 17
+| Ref | Componente | Cantidad | Valor | Notas |
+|-----|------------|----------|-------|-------|
+| L1  | Inductor   | 1        | 12nH  | SMD 0402, Q>30 |
+| C_rf1 | Ceramic  | 1        | 1pF   | C0G/NP0 0402 |
+| C_rf2 | Ceramic  | 1        | 1pF   | C0G/NP0 0402 |
+| C_rf3 | Ceramic  | 1        | 1pF   | C0G/NP0 0402 |
+
+---
+
 ## RESTRICCIONES DE DISENO
 
 1. **Separacion RF:** El modulo CC1101 debe estar fisicamente lejos del SPI de MicroSD para minimizar ruido
@@ -285,3 +342,4 @@ CS separados:
 3. **IR TX:** El LED IR puede dibujar hasta 100mA, usar transistor para no sobrecargar el pin GPIO
 4. **Pull-ups I2C:** Los 4.7k internos del STM32H747 son suficientes para 400kHz
 5. **Decoupling:** 100nF ceramic en cada VCC de modulo RF
+6. **RF Matching (Fase 17):** Usar red Pi-network con L=12nH, C=1pF para adaptar 50 ohm

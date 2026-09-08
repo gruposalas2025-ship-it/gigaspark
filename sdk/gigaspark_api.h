@@ -66,6 +66,23 @@ typedef struct giga_api {
 	void  (*set_font)(uint8_t font_id);
 	void  (*get_text_size)(const char *text, int *w, int *h);
 
+	/* Red (Fase 16) */
+	int   (*http_get)(const char *url, uint8_t *buf, size_t buf_len,
+			  size_t *out_len);
+	int   (*http_post)(const char *url, const char *content_type,
+			   const uint8_t *data, size_t data_len,
+			   uint8_t *buf, size_t buf_len, size_t *out_len);
+
+	/* Memoria avanzada (Fase 16) */
+	uint32_t (*mem_alloc_buddy)(uint32_t size);
+	void     (*mem_free_buddy)(uint32_t handle);
+	uint8_t  (*mem_get_usage)(void);
+
+	/* zRAM LRU (Fase 16) */
+	size_t (*zram_store)(uint32_t handle, const uint8_t *data, size_t len);
+	size_t (*zram_load)(uint32_t handle, uint8_t *buf, size_t buf_len);
+	void   (*zram_get_stats)(uint8_t *used, uint8_t *total, uint32_t *counter);
+
 } giga_api_t;
 
 /* API table address (linker symbol) */
