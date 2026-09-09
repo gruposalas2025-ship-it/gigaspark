@@ -1,10 +1,11 @@
 /*
- * Gigaspark OS - Simulador Nativo (SDL2)
+ * Gigaspark OS - Simulador Nativo (Gemelo Digital)
  *
- * Ejecuta el OS de Gigaspark en una ventana de PC usando SDL2.
- * Simula la pantalla 480x272 y el touch via raton.
+ * Interfaz exacta del Giga Display Shield 480x272.
+ * Renderiza LVGL-style con fuentes reales, colores exactos,
+ * y widgets profesionales (barras, botones, indicadores).
  *
- * Compilar: cd simulator && mkdir build && cd build && cmake .. && make
+ * Compilar: cd simulator && make
  * Ejecutar: ./gigaspark_sim
  */
 
@@ -13,200 +14,641 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-
-/* Incluir header del SDK para la tabla de API */
-#include "gigaspark_api.h"
+#include <math.h>
 
 /* ============================================================
- * CONSTANTES
+ * CONSTANTES DE PANTALLA
  * ============================================================ */
 
 #define SCREEN_W        480
 #define SCREEN_H        272
-#define WINDOW_SCALE    2      /* Ventana 960x544 (2x) */
+#define WINDOW_SCALE    2
 #define WINDOW_W        (SCREEN_W * WINDOW_SCALE)
 #define WINDOW_H        (SCREEN_H * WINDOW_SCALE)
-#define WINDOW_TITLE    "Gigaspark OS - Simulador"
+#define WINDOW_TITLE    "Gigaspark OS - Gemelo Digital"
 #define TARGET_FPS      30
 #define FRAME_MS        (1000 / TARGET_FPS)
 
 /* ============================================================
- * FRAMEBUFFER Y ESTADO
+ * COLORES EXACTOS GIGA DISPLAY SHIELD (RGB565)
  * ============================================================ */
 
-/* Framebuffer RGB565 (del SDK) */
-extern uint16_t sim_fb[SCREEN_W * SCREEN_H];
-
-/* Touch desde SDK */
-extern void sim_set_touch(int x, int y, bool pressed);
-
-/* API table (simulada en memoria) */
-static giga_api_t *api = (giga_api_t *)GIGA_API_TABLE_ADDR;
+#define C_BG_DARK       0x0000  /* Negro puro - fondo principal */
+#define C_BG_PANEL      0x10A2  /* Gris muy oscuro - paneles */
+#define C_BG_CARD       0x2124  /* Gris oscuro - tarjetas */
+#define C_BORDER        0x4208  /* Gris medio - bordes */
+#define C_TEXT_PRIMARY   0xFFFF  /* Blanco - texto principal */
+#define C_TEXT_SECONDARY 0xBDF7  /* Gris claro - texto secundario */
+#define C_TEXT_DIM       0x7BEF  /* Gris - texto deshabilitado */
+#define C_ACCENT         0x07FF  /* Cyan - acento principal */
+#define C_ACCENT_DARK    0x03FF  /* Cyan oscuro */
+#define C_GREEN          0x07E0  /* Verde -成功/ON */
+#define C_RED            0xF800  /* Rojo - error/OFF */
+#define C_YELLOW         0xFFE0  /* Amarillo - advertencia */
+#define C_ORANGE         0xFD20  /* Naranja */
+#define C_BLUE           0x001F  /* Azul - botones */
+#define C_BLUE_LIGHT     0x5D1F  /* Azul claro */
+#define C_PURPLE         0x881F  /* Morado */
+#define C_NAV_BAR        0x18C3  /* Barra de navegacion */
+#define C_STATUS_BAR     0x0842  /* Barra de estado */
 
 /* ============================================================
- * Launcher Menu (simula el menu del Arduino Giga)
+ * FRAMEBUFFER
  * ============================================================ */
 
-#define MAX_APPS    8
-#define APP_NAME_LEN 32
+static uint16_t fb[SCREEN_W * SCREEN_H];
 
-typedef struct {
-	char name[APP_NAME_LEN];
-	char desc[64];
-} app_entry_t;
+/* ============================================================
+ * FONT 8x16 BITMAP (ASCII 32-127)
+ * ============================================================ */
 
-static app_entry_t app_list[MAX_APPS];
-static int app_count = 0;
-static int selected_app = 0;
+static const uint8_t font_8x16[][16] = {
+	/* Espacio */ {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+	/* ! */ {0x00,0x00,0x18,0x3C,0x3C,0x3C,0x18,0x18,0x18,0x00,0x18,0x18,0x00,0x00,0x00,0x00},
+	/* " */ {0x00,0x66,0x66,0x66,0x24,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+	/* # */ {0x00,0x00,0x00,0x6C,0x6C,0xFE,0x6C,0x6C,0x6C,0xFE,0x6C,0x6C,0x00,0x00,0x00,0x00},
+	/* $ */ {0x18,0x18,0x7C,0xC6,0xC2,0xC0,0x7C,0x06,0x06,0x86,0xC6,0x7C,0x18,0x18,0x00,0x00},
+	/* % */ {0x00,0x00,0x00,0x00,0xC2,0xC6,0x0C,0x18,0x30,0x60,0xC6,0x86,0x00,0x00,0x00,0x00},
+	/* & */ {0x00,0x00,0x38,0x6C,0x6C,0x38,0x76,0xDC,0xCC,0xCC,0xCC,0x76,0x00,0x00,0x00,0x00},
+	/* ' */ {0x00,0x30,0x30,0x30,0x60,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+	/* ( */ {0x00,0x00,0x0C,0x18,0x30,0x30,0x30,0x30,0x30,0x30,0x18,0x0C,0x00,0x00,0x00,0x00},
+	/* ) */ {0x00,0x00,0x30,0x18,0x0C,0x0C,0x0C,0x0C,0x0C,0x0C,0x18,0x30,0x00,0x00,0x00,0x00},
+	/* * */ {0x00,0x00,0x00,0x00,0x00,0x66,0x3C,0xFF,0x3C,0x66,0x00,0x00,0x00,0x00,0x00,0x00},
+	/* + */ {0x00,0x00,0x00,0x00,0x00,0x18,0x18,0x7E,0x18,0x18,0x00,0x00,0x00,0x00,0x00,0x00},
+	/* , */ {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x18,0x18,0x18,0x30,0x00,0x00,0x00},
+	/* - */ {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFE,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+	/* . */ {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x18,0x18,0x00,0x00,0x00,0x00},
+	/* / */ {0x00,0x00,0x00,0x00,0x02,0x06,0x0C,0x18,0x30,0x60,0xC0,0x80,0x00,0x00,0x00,0x00},
+	/* 0 */ {0x00,0x00,0x7C,0xC6,0xC6,0xCE,0xDE,0xF6,0xE6,0xC6,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* 1 */ {0x00,0x00,0x18,0x38,0x78,0x18,0x18,0x18,0x18,0x18,0x18,0x7E,0x00,0x00,0x00,0x00},
+	/* 2 */ {0x00,0x00,0x7C,0xC6,0x06,0x0C,0x18,0x30,0x60,0xC0,0xC6,0xFE,0x00,0x00,0x00,0x00},
+	/* 3 */ {0x00,0x00,0x7C,0xC6,0x06,0x06,0x3C,0x06,0x06,0x06,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* 4 */ {0x00,0x00,0x0C,0x1C,0x3C,0x6C,0xCC,0xFE,0x0C,0x0C,0x0C,0x1E,0x00,0x00,0x00,0x00},
+	/* 5 */ {0x00,0x00,0xFE,0xC0,0xC0,0xC0,0xFC,0x06,0x06,0x06,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* 6 */ {0x00,0x00,0x38,0x60,0xC0,0xC0,0xFC,0xC6,0xC6,0xC6,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* 7 */ {0x00,0x00,0xFE,0xC6,0x06,0x06,0x0C,0x18,0x30,0x30,0x30,0x30,0x00,0x00,0x00,0x00},
+	/* 8 */ {0x00,0x00,0x7C,0xC6,0xC6,0xC6,0x7C,0xC6,0xC6,0xC6,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* 9 */ {0x00,0x00,0x7C,0xC6,0xC6,0xC6,0x7E,0x06,0x06,0x06,0x0C,0x78,0x00,0x00,0x00,0x00},
+	/* : */ {0x00,0x00,0x00,0x00,0x18,0x18,0x00,0x00,0x00,0x18,0x18,0x00,0x00,0x00,0x00,0x00},
+	/* ; */ {0x00,0x00,0x00,0x00,0x18,0x18,0x00,0x00,0x00,0x18,0x18,0x30,0x00,0x00,0x00,0x00},
+	/* < */ {0x00,0x00,0x00,0x06,0x0C,0x18,0x30,0x60,0x30,0x18,0x0C,0x06,0x00,0x00,0x00,0x00},
+	/* = */ {0x00,0x00,0x00,0x00,0x00,0x7E,0x00,0x00,0x7E,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+	/* > */ {0x00,0x00,0x00,0x60,0x30,0x18,0x0C,0x06,0x0C,0x18,0x30,0x60,0x00,0x00,0x00,0x00},
+	/* ? */ {0x00,0x00,0x7C,0xC6,0xC6,0x0C,0x18,0x18,0x18,0x00,0x18,0x18,0x00,0x00,0x00,0x00},
+	/* @ */ {0x00,0x00,0x00,0x7C,0xC6,0xC6,0xDE,0xDE,0xDE,0xDC,0xC0,0x7C,0x00,0x00,0x00,0x00},
+	/* A */ {0x00,0x00,0x10,0x38,0x6C,0xC6,0xC6,0xFE,0xC6,0xC6,0xC6,0xC6,0x00,0x00,0x00,0x00},
+	/* B */ {0x00,0x00,0xFC,0x66,0x66,0x66,0x7C,0x66,0x66,0x66,0x66,0xFC,0x00,0x00,0x00,0x00},
+	/* C */ {0x00,0x00,0x3C,0x66,0xC2,0xC0,0xC0,0xC0,0xC0,0xC2,0x66,0x3C,0x00,0x00,0x00,0x00},
+	/* D */ {0x00,0x00,0xF8,0x6C,0x66,0x66,0x66,0x66,0x66,0x66,0x6C,0xF8,0x00,0x00,0x00,0x00},
+	/* E */ {0x00,0x00,0xFE,0x66,0x62,0x68,0x78,0x68,0x60,0x62,0x66,0xFE,0x00,0x00,0x00,0x00},
+	/* F */ {0x00,0x00,0xFE,0x66,0x62,0x68,0x78,0x68,0x60,0x60,0x60,0xF0,0x00,0x00,0x00,0x00},
+	/* G */ {0x00,0x00,0x3C,0x66,0xC2,0xC0,0xC0,0xDE,0xC6,0xC6,0x66,0x3A,0x00,0x00,0x00,0x00},
+	/* H */ {0x00,0x00,0xC6,0xC6,0xC6,0xC6,0xFE,0xC6,0xC6,0xC6,0xC6,0xC6,0x00,0x00,0x00,0x00},
+	/* I */ {0x00,0x00,0x3C,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x3C,0x00,0x00,0x00,0x00},
+	/* J */ {0x00,0x00,0x1E,0x0C,0x0C,0x0C,0x0C,0x0C,0xCC,0xCC,0xCC,0x78,0x00,0x00,0x00,0x00},
+	/* K */ {0x00,0x00,0xE6,0x66,0x66,0x6C,0x78,0x78,0x6C,0x66,0x66,0xE6,0x00,0x00,0x00,0x00},
+	/* L */ {0x00,0x00,0xF0,0x60,0x60,0x60,0x60,0x60,0x60,0x62,0x66,0xFE,0x00,0x00,0x00,0x00},
+	/* M */ {0x00,0x00,0xC6,0xEE,0xFE,0xFE,0xD6,0xC6,0xC6,0xC6,0xC6,0xC6,0x00,0x00,0x00,0x00},
+	/* N */ {0x00,0x00,0xC6,0xE6,0xF6,0xFE,0xDE,0xCE,0xC6,0xC6,0xC6,0xC6,0x00,0x00,0x00,0x00},
+	/* O */ {0x00,0x00,0x7C,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* P */ {0x00,0x00,0xFC,0x66,0x66,0x66,0x7C,0x60,0x60,0x60,0x60,0xF0,0x00,0x00,0x00,0x00},
+	/* Q */ {0x00,0x00,0x7C,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0xD6,0xDE,0x7C,0x0C,0x0E,0x00,0x00},
+	/* R */ {0x00,0x00,0xFC,0x66,0x66,0x66,0x7C,0x6C,0x66,0x66,0x66,0xE6,0x00,0x00,0x00,0x00},
+	/* S */ {0x00,0x00,0x7C,0xC6,0xC6,0x60,0x38,0x0C,0x06,0xC6,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* T */ {0x00,0x00,0x7E,0x7E,0x5A,0x18,0x18,0x18,0x18,0x18,0x18,0x3C,0x00,0x00,0x00,0x00},
+	/* U */ {0x00,0x00,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* V */ {0x00,0x00,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0x6C,0x38,0x10,0x00,0x00,0x00,0x00},
+	/* W */ {0x00,0x00,0xC6,0xC6,0xC6,0xC6,0xD6,0xD6,0xD6,0xFE,0xEE,0x6C,0x00,0x00,0x00,0x00},
+	/* X */ {0x00,0x00,0xC6,0xC6,0x6C,0x7C,0x38,0x38,0x7C,0x6C,0xC6,0xC6,0x00,0x00,0x00,0x00},
+	/* Y */ {0x00,0x00,0x66,0x66,0x66,0x66,0x3C,0x18,0x18,0x18,0x18,0x3C,0x00,0x00,0x00,0x00},
+	/* Z */ {0x00,0x00,0xFE,0xC6,0x86,0x0C,0x18,0x30,0x60,0xC2,0xC6,0xFE,0x00,0x00,0x00,0x00},
+	/* [ */ {0x00,0x00,0x3C,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x3C,0x00,0x00,0x00,0x00},
+	/* \ */ {0x00,0x00,0x00,0x80,0xC0,0x60,0x30,0x18,0x0C,0x06,0x02,0x00,0x00,0x00,0x00,0x00},
+	/* ] */ {0x00,0x00,0x3C,0x0C,0x0C,0x0C,0x0C,0x0C,0x0C,0x0C,0x0C,0x3C,0x00,0x00,0x00,0x00},
+	/* ^ */ {0x10,0x38,0x6C,0xC6,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+	/* _ */ {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0x00},
+	/* ` */ {0x30,0x30,0x18,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+	/* a */ {0x00,0x00,0x00,0x00,0x00,0x78,0x0C,0x7C,0xCC,0xCC,0xCC,0x76,0x00,0x00,0x00,0x00},
+	/* b */ {0x00,0x00,0xE0,0x60,0x60,0x78,0x6C,0x66,0x66,0x66,0x66,0x7C,0x00,0x00,0x00,0x00},
+	/* c */ {0x00,0x00,0x00,0x00,0x00,0x7C,0xC6,0xC0,0xC0,0xC0,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* d */ {0x00,0x00,0x1C,0x0C,0x0C,0x3C,0x6C,0xCC,0xCC,0xCC,0xCC,0x76,0x00,0x00,0x00,0x00},
+	/* e */ {0x00,0x00,0x00,0x00,0x00,0x7C,0xC6,0xFE,0xC0,0xC0,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* f */ {0x00,0x00,0x1C,0x36,0x32,0x30,0x78,0x30,0x30,0x30,0x30,0x78,0x00,0x00,0x00,0x00},
+	/* g */ {0x00,0x00,0x00,0x00,0x00,0x76,0xCC,0xCC,0xCC,0xCC,0x7C,0x0C,0xCC,0x78,0x00,0x00},
+	/* h */ {0x00,0x00,0xE0,0x60,0x60,0x6C,0x76,0x66,0x66,0x66,0x66,0xE6,0x00,0x00,0x00,0x00},
+	/* i */ {0x00,0x00,0x18,0x18,0x00,0x38,0x18,0x18,0x18,0x18,0x18,0x3C,0x00,0x00,0x00,0x00},
+	/* j */ {0x00,0x00,0x06,0x06,0x00,0x0E,0x06,0x06,0x06,0x06,0x06,0x06,0x66,0x3C,0x00,0x00},
+	/* k */ {0x00,0x00,0xE0,0x60,0x60,0x66,0x6C,0x78,0x78,0x6C,0x66,0xE6,0x00,0x00,0x00,0x00},
+	/* l */ {0x00,0x00,0x38,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x3C,0x00,0x00,0x00,0x00},
+	/* m */ {0x00,0x00,0x00,0x00,0x00,0xEC,0xFE,0xD6,0xD6,0xD6,0xD6,0xC6,0x00,0x00,0x00,0x00},
+	/* n */ {0x00,0x00,0x00,0x00,0x00,0xDC,0x66,0x66,0x66,0x66,0x66,0x66,0x00,0x00,0x00,0x00},
+	/* o */ {0x00,0x00,0x00,0x00,0x00,0x7C,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* p */ {0x00,0x00,0x00,0x00,0x00,0xDC,0x66,0x66,0x66,0x66,0x7C,0x60,0x60,0xF0,0x00,0x00},
+	/* q */ {0x00,0x00,0x00,0x00,0x00,0x76,0xCC,0xCC,0xCC,0xCC,0x7C,0x0C,0x0C,0x1E,0x00,0x00},
+	/* r */ {0x00,0x00,0x00,0x00,0x00,0xDC,0x76,0x66,0x60,0x60,0x60,0xF0,0x00,0x00,0x00,0x00},
+	/* s */ {0x00,0x00,0x00,0x00,0x00,0x7C,0xC6,0x60,0x38,0x0C,0xC6,0x7C,0x00,0x00,0x00,0x00},
+	/* t */ {0x00,0x00,0x10,0x30,0x30,0xFC,0x30,0x30,0x30,0x30,0x36,0x1C,0x00,0x00,0x00,0x00},
+	/* u */ {0x00,0x00,0x00,0x00,0x00,0xCC,0xCC,0xCC,0xCC,0xCC,0xCC,0x76,0x00,0x00,0x00,0x00},
+	/* v */ {0x00,0x00,0x00,0x00,0x00,0xC6,0xC6,0xC6,0xC6,0x6C,0x38,0x10,0x00,0x00,0x00,0x00},
+	/* w */ {0x00,0x00,0x00,0x00,0x00,0xC6,0xC6,0xD6,0xD6,0xD6,0xFE,0x6C,0x00,0x00,0x00,0x00},
+	/* x */ {0x00,0x00,0x00,0x00,0x00,0xC6,0x6C,0x38,0x38,0x38,0x6C,0xC6,0x00,0x00,0x00,0x00},
+	/* y */ {0x00,0x00,0x00,0x00,0x00,0xC6,0xC6,0xC6,0xC6,0xC6,0x7E,0x06,0x0C,0xF8,0x00,0x00},
+	/* z */ {0x00,0x00,0x00,0x00,0x00,0xFE,0xCC,0x18,0x30,0x60,0xC6,0xFE,0x00,0x00,0x00,0x00},
+	/* { */ {0x00,0x00,0x0E,0x18,0x18,0x18,0x70,0x18,0x18,0x18,0x18,0x0E,0x00,0x00,0x00,0x00},
+	/* | */ {0x00,0x00,0x18,0x18,0x18,0x18,0x00,0x18,0x18,0x18,0x18,0x18,0x00,0x00,0x00,0x00},
+	/* } */ {0x00,0x00,0x70,0x18,0x18,0x18,0x0E,0x18,0x18,0x18,0x18,0x70,0x00,0x00,0x00,0x00},
+	/* ~ */ {0x00,0x00,0x76,0xDC,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+};
 
-static void init_app_list(void)
+/* ============================================================
+ * PRIMITIVAS DE RENDERIZADO
+ * ============================================================ */
+
+/* Entero a string (minimo 12 bytes) */
+static void utoa(uint32_t val, char *buf)
 {
-	/* Apps del sistema (simuladas) */
-	snprintf(app_list[0].name, APP_NAME_LEN, "Clicker");
-	snprintf(app_list[0].desc, 64, "Demo de touch interactiva");
-	snprintf(app_list[1].name, APP_NAME_LEN, "Settings");
-	snprintf(app_list[1].desc, 64, "Ajustes y monitor de recursos");
-	snprintf(app_list[2].name, APP_NAME_LEN, "Oscilloscope");
-	snprintf(app_list[2].desc, 64, "Osciloscopio 2 canales");
-	snprintf(app_list[3].name, APP_NAME_LEN, "Power Supply");
-	snprintf(app_list[3].desc, 64, "Fuente de poder dual");
-	snprintf(app_list[4].name, APP_NAME_LEN, "Flipper");
-	snprintf(app_list[4].desc, 64, "Herramientas RF/IR/NFC");
-	app_count = 5;
+	char tmp[12];
+	int i = 0;
+	if (val == 0) {
+		buf[0] = '0';
+		buf[1] = '\0';
+		return;
+	}
+	while (val > 0) {
+		tmp[i++] = '0' + (val % 10);
+		val /= 10;
+	}
+	for (int j = 0; j < i; j++) {
+		buf[j] = tmp[i - 1 - j];
+	}
+	buf[i] = '\0';
 }
 
-/* Dibujar un caracter simple (font 8x16 bitmap) */
-static void draw_char(int x, int y, char c, uint16_t color)
+static inline void put_pixel(int x, int y, uint16_t color)
 {
-	/* Font bitmap simple 8x16 para ASCII 32-127 */
-	/* Solo dibujamos '#' como placeholder para cada caracter visible */
-	if (c < 32 || c > 126) return;
+	if (x >= 0 && x < SCREEN_W && y >= 0 && y < SCREEN_H) {
+		fb[y * SCREEN_W + x] = color;
+	}
+}
 
-	for (int row = 0; row < 14; row++) {
+static void fill_rect(int x, int y, int w, int h, uint16_t color)
+{
+	for (int row = y; row < y + h; row++) {
+		for (int col = x; col < x + w; col++) {
+			put_pixel(col, row, color);
+		}
+	}
+}
+
+static void draw_rect(int x, int y, int w, int h, uint16_t color)
+{
+	for (int i = 0; i < w; i++) {
+		put_pixel(x + i, y, color);
+		put_pixel(x + i, y + h - 1, color);
+	}
+	for (int j = 0; j < h; j++) {
+		put_pixel(x, y + j, color);
+		put_pixel(x + w - 1, y + j, color);
+	}
+}
+
+static void draw_char(int x, int y, char c, uint16_t color, int scale)
+{
+	int idx = c - 32;
+	if (idx < 0 || idx > 94) return;
+
+	for (int row = 0; row < 16; row++) {
+		uint8_t bits = font_8x16[idx][row];
 		for (int col = 0; col < 8; col++) {
-			/* Patron: todos los caracteres visibles son bloques solidos */
-			int px = x + col;
-			int py = y + row;
-			if (px >= 0 && px < SCREEN_W && py >= 0 && py < SCREEN_H) {
-				sim_fb[py * SCREEN_W + px] = color;
+			if (bits & (0x80 >> col)) {
+				for (int sy = 0; sy < scale; sy++) {
+					for (int sx = 0; sx < scale; sx++) {
+						put_pixel(x + col * scale + sx,
+							  y + row * scale + sy, color);
+					}
+				}
 			}
 		}
 	}
 }
 
-/* Dibujar string (font 8x14) */
-static void draw_string(int x, int y, const char *str, uint16_t color)
+static void draw_string(int x, int y, const char *str, uint16_t color, int scale)
 {
 	int cx = x;
 	while (*str) {
 		if (*str == '\n') {
 			cx = x;
-			y += 16;
+			y += 16 * scale;
 		} else {
-			draw_char(cx, y, *str, color);
-			cx += 8;
+			draw_char(cx, y, *str, color, scale);
+			cx += 8 * scale;
 		}
 		str++;
 	}
 }
 
-/* Dibujar rectangulo relleno */
-static void fill_rect(int x, int y, int w, int h, uint16_t color)
+static void draw_string_centered(int y, const char *str, uint16_t color, int scale)
 {
-	for (int row = y; row < y + h && row < SCREEN_H; row++) {
-		for (int col = x; col < x + w && col < SCREEN_W; col++) {
-			if (col >= 0 && row >= 0) {
-				sim_fb[row * SCREEN_W + col] = color;
-			}
-		}
+	int len = strlen(str) * 8 * scale;
+	int x = (SCREEN_W - len) / 2;
+	draw_string(x, y, str, color, scale);
+}
+
+/* ============================================================
+ * WIDGETS LVGL-STYLE
+ * ============================================================ */
+
+/* Barra de progreso */
+static void draw_progress_bar(int x, int y, int w, int h, uint8_t pct, uint16_t fg, uint16_t bg)
+{
+	draw_rect(x, y, w, h, C_BORDER);
+	fill_rect(x + 1, y + 1, w - 2, h - 2, bg);
+	int fill_w = (w - 4) * pct / 100;
+	if (fill_w > 0) {
+		fill_rect(x + 2, y + 2, fill_w, h - 4, fg);
 	}
 }
 
-/* Dibujar rectangulo con borde */
-static void draw_rect(int x, int y, int w, int h, uint16_t color)
+/* Boton con texto centrado */
+static void draw_button(int x, int y, int w, int h, const char *text, uint16_t bg, uint16_t fg, bool pressed)
 {
-	for (int i = 0; i < w; i++) {
-		if (x+i >= 0 && x+i < SCREEN_W) {
-			if (y >= 0 && y < SCREEN_H)
-				sim_fb[y * SCREEN_W + (x+i)] = color;
-			if (y+h-1 >= 0 && y+h-1 < SCREEN_H)
-				sim_fb[(y+h-1) * SCREEN_W + (x+i)] = color;
-		}
-	}
-	for (int j = 0; j < h; j++) {
-		if (y+j >= 0 && y+j < SCREEN_H) {
-			if (x >= 0 && x < SCREEN_W)
-				sim_fb[(y+j) * SCREEN_W + x] = color;
-			if (x+w-1 >= 0 && x+w-1 < SCREEN_W)
-				sim_fb[(y+j) * SCREEN_W + (x+w-1)] = color;
-		}
-	}
+	uint16_t actual_bg = pressed ? C_ACCENT_DARK : bg;
+	fill_rect(x, y, w, h, actual_bg);
+	draw_rect(x, y, w, h, C_BORDER);
+
+	/* Texto centrado */
+	int tw = strlen(text) * 8;
+	int th = 16;
+	int tx = x + (w - tw) / 2;
+	int ty = y + (h - th) / 2;
+	draw_string(tx, ty, text, fg, 1);
 }
 
-/* Dibujar barra de navegacion */
-static void draw_nav_bar(void)
+/* Indicador de bateria */
+static void draw_battery(int x, int y, uint8_t pct)
 {
-	int bar_y = SCREEN_H - 40;
+	/* Cuerpo */
+	draw_rect(x, y, 24, 12, C_TEXT_SECONDARY);
+	fill_rect(x + 2, y + 2, 20, 8, pct > 20 ? C_GREEN : C_RED);
+	/* Borde positivo */
+	fill_rect(x + 24, y + 3, 3, 6, C_TEXT_SECONDARY);
+	/* Porcentaje */
+	char buf[8];
+	utoa(pct, buf);
+	draw_string(x - 30, y - 2, buf, C_TEXT_SECONDARY, 1);
+}
 
-	/* Fondo de la barra */
-	fill_rect(0, bar_y, SCREEN_W, 40, 0x4208);  /* Gris oscuro */
+/* Reloj / status bar */
+static void draw_status_bar(uint32_t tick_ms, uint8_t battery_pct)
+{
+	/* Fondo */
+	fill_rect(0, 0, SCREEN_W, 22, C_STATUS_BAR);
+	fill_rect(0, 22, SCREEN_W, 1, C_BORDER);
 
-	/* Linea separadora */
-	fill_rect(0, bar_y, SCREEN_W, 2, 0x7BEF);  /* Gris */
+	/* Titulo izquierda */
+	draw_string(8, 4, "GIGASPARK OS", C_ACCENT, 1);
 
-	/* Boton Home (centro) */
-	int btn_x = 190;
-	int btn_w = 100;
+	/* Bateria derecha */
+	draw_battery(SCREEN_W - 80, 5, battery_pct);
+
+	/* Hora simulada */
+	uint32_t seconds = tick_ms / 1000;
+	int hrs = (seconds / 3600) % 24;
+	int mins = (seconds / 60) % 60;
+	char time_buf[8];
+	time_buf[0] = '0' + hrs / 10;
+	time_buf[1] = '0' + hrs % 10;
+	time_buf[2] = ':';
+	time_buf[3] = '0' + mins / 10;
+	time_buf[4] = '0' + mins % 10;
+	time_buf[5] = '\0';
+	draw_string(SCREEN_W / 2 - 20, 4, time_buf, C_TEXT_SECONDARY, 1);
+}
+
+/* Barra de navegacion inferior */
+static int nav_bar_y;
+static void draw_nav_bar(int selected)
+{
+	nav_bar_y = SCREEN_H - 44;
+
+	/* Fondo */
+	fill_rect(0, nav_bar_y, SCREEN_W, 44, C_NAV_BAR);
+	fill_rect(0, nav_bar_y, SCREEN_W, 1, C_BORDER);
+
+	/* Botones: Home | Back | Menu */
+	int btn_w = 120;
 	int btn_h = 30;
-	int btn_y = bar_y + 5;
+	int btn_y = nav_bar_y + 7;
+	int gap = (SCREEN_W - btn_w * 3) / 4;
 
-	fill_rect(btn_x, btn_y, btn_w, btn_h, 0x001F);  /* Azul */
-	draw_rect(btn_x, btn_y, btn_w, btn_h, 0xFFFF);  /* Borde blanco */
-	draw_string(btn_x + 30, btn_y + 8, "HOME", 0xFFFF);
+	const char *labels[] = {"HOME", "BACK", "MENU"};
+	uint16_t colors[] = {C_BLUE, C_BLUE, C_BLUE};
+
+	for (int i = 0; i < 3; i++) {
+		int bx = gap + i * (btn_w + gap);
+		bool is_sel = (i == selected);
+		draw_button(bx, btn_y, btn_w, btn_h, labels[i],
+			    is_sel ? C_ACCENT : colors[i], C_TEXT_PRIMARY, is_sel);
+	}
 }
 
-/* Dibujar el launcher menu */
-static void draw_launcher(void)
+/* ============================================================
+ * SCREENS DE APPS
+ * ============================================================ */
+
+/* Launcher principal */
+static int launcher_selection = 0;
+#define LAUNCHER_APPS 6
+
+static const char *app_names[] = {
+	"Oscilloscope",
+	"Power Supply",
+	"Flipper RF",
+	"WiFi Scanner",
+	"Settings",
+	"About"
+};
+
+static const char *app_icons[] = {
+	"~",  /* Onda sinusoidal */
+	"+",  /* Plus (alimentacion) */
+	")",  /* Antena */
+	"*",  /* Estrella (scanner) */
+	"#",  /* Settings */
+	"i"   /* Info */
+};
+
+static void draw_launcher(uint32_t tick, uint8_t battery)
 {
-	/* Fondo negro */
-	fill_rect(0, 0, SCREEN_W, SCREEN_H, 0x0000);
+	draw_status_bar(tick, battery);
 
 	/* Titulo */
-	draw_string(20, 10, "GIGASPARK OS v1.0", 0x07FF);  /* Cyan */
-	draw_string(20, 30, "Simulador Nativo - SDL2", 0x7BEF);  /* Gris */
+	draw_string(20, 32, "GIGASPARK OS", C_ACCENT, 2);
+	draw_string(20, 68, "v1.0 - Dual-Core RTOS", C_TEXT_DIM, 1);
 
-	/* Lista de apps */
-	int y = 60;
-	for (int i = 0; i < app_count; i++) {
-		int item_h = 36;
-		uint16_t bg = (i == selected_app) ? 0x001F : 0x2104;  /* Azul seleccion / gris */
-		uint16_t fg = (i == selected_app) ? 0xFFFF : 0x7BEF;
+	/* Grid de apps (2 columnas, 3 filas) */
+	int col_w = 200;
+	int row_h = 50;
+	int start_x = 40;
+	int start_y = 100;
 
-		/* Fondo del item */
-		fill_rect(20, y, SCREEN_W - 40, item_h, bg);
+	for (int i = 0; i < LAUNCHER_APPS; i++) {
+		int col = i % 2;
+		int row = i / 2;
+		int x = start_x + col * (col_w + 20);
+		int y = start_y + row * (row_h + 10);
 
-		/* Borde */
-		draw_rect(20, y, SCREEN_W - 40, item_h, 0x7BEF);
+		bool is_sel = (i == launcher_selection);
+		uint16_t bg = is_sel ? C_ACCENT_DARK : C_BG_CARD;
+		uint16_t fg = is_sel ? C_TEXT_PRIMARY : C_TEXT_SECONDARY;
 
-		/* Indicador de seleccion */
-		if (i == selected_app) {
-			draw_string(30, y + 10, ">", 0xFFE0);  /* Amarillo */
+		/* Card */
+		fill_rect(x, y, col_w, row_h, bg);
+		draw_rect(x, y, col_w, row_h, is_sel ? C_ACCENT : C_BORDER);
+
+		/* Icono */
+		draw_string(x + 10, y + 8, app_icons[i], is_sel ? C_YELLOW : C_ACCENT, 2);
+
+		/* Nombre */
+		draw_string(x + 40, y + 14, app_names[i], fg, 1);
+
+		/* Flecha de seleccion */
+		if (is_sel) {
+			draw_string(x + col_w - 20, y + 14, ">", C_YELLOW, 1);
 		}
-
-		/* Nombre de la app */
-		draw_string(50, y + 4, app_list[i].name, fg);
-
-		/* Descripcion */
-		draw_string(50, y + 20, app_list[i].desc, 0x7BEF);
-
-		y += item_h + 4;
 	}
 
-	/* Barra de navegacion */
-	draw_nav_bar();
+	draw_nav_bar(-1);
+}
 
-	/* Instrucciones */
-	draw_string(20, SCREEN_H - 55, "Click para seleccionar", 0x7BEF);
+/* Osciloscopio */
+static float scope_phase = 0.0f;
+
+static void draw_oscilloscope(uint32_t tick, uint8_t battery)
+{
+	draw_status_bar(tick, battery);
+
+	/* Titulo */
+	draw_string(20, 30, "OSCILLOSCOPE", C_GREEN, 2);
+	draw_string(20, 58, "2 CANALES - 1 MSPS", C_TEXT_DIM, 1);
+
+	/* Grid del osciloscopio */
+	int grid_x = 30;
+	int grid_y = 80;
+	int grid_w = 300;
+	int grid_h = 150;
+
+	/* Fondo del grid */
+	fill_rect(grid_x, grid_y, grid_w, grid_h, 0x0008);
+
+	/* Lineas de grid */
+	for (int i = 0; i <= 8; i++) {
+		int x = grid_x + i * (grid_w / 8);
+		for (int y = grid_y; y < grid_y + grid_h; y += 2) {
+			put_pixel(x, y, 0x2104);
+		}
+	}
+	for (int i = 0; i <= 6; i++) {
+		int y = grid_y + i * (grid_h / 6);
+		for (int x = grid_x; x < grid_x + grid_w; x += 2) {
+			put_pixel(x, y, 0x2104);
+		}
+	}
+
+	/* Onda sinusoidal (Canal 1 - Verde) */
+	scope_phase += 0.15f;
+	float freq = 50.0f;
+	float amp = 50.0f;
+
+	for (int x = 0; x < grid_w; x++) {
+		float t = (float)x / grid_w;
+		float val = sinf(2.0f * 3.14159f * freq * t + scope_phase);
+		int y = grid_y + grid_h / 2 - (int)(val * amp);
+		if (y >= grid_y && y < grid_y + grid_h) {
+			put_pixel(grid_x + x, y, C_GREEN);
+			if (y + 1 < grid_y + grid_h) put_pixel(grid_x + x, y + 1, C_GREEN);
+		}
+	}
+
+	/* Onda cuadrada (Canal 2 - Amarilla) */
+	for (int x = 0; x < grid_w; x++) {
+		float t = (float)x / grid_w;
+		float val = sinf(2.0f * 3.14159f * 25.0f * t + scope_phase * 0.7f);
+		int y = grid_y + grid_h / 2 - (int)(val > 0 ? 30.0f : -30.0f);
+		if (y >= grid_y && y < grid_y + grid_h) {
+			put_pixel(grid_x + x, y, C_YELLOW);
+		}
+	}
+
+	/* Borde */
+	draw_rect(grid_x, grid_y, grid_w, grid_h, C_BORDER);
+
+	/* Panel de mediciones */
+	int panel_x = 350;
+	int panel_y = 80;
+
+	draw_string(panel_x, panel_y, "MEDICIONES", C_ACCENT, 1);
+	draw_string(panel_x, panel_y + 24, "CH1: SENO", C_GREEN, 1);
+	draw_string(panel_x, panel_y + 44, "Vpp: 2.00V", C_TEXT_PRIMARY, 1);
+	draw_string(panel_x, panel_y + 60, "Freq: 50Hz", C_TEXT_PRIMARY, 1);
+	draw_string(panel_x, panel_y + 80, "CH2: CUAD", C_YELLOW, 1);
+	draw_string(panel_x, panel_y + 100, "Vpp: 1.20V", C_TEXT_PRIMARY, 1);
+	draw_string(panel_x, panel_y + 120, "Freq: 25Hz", C_TEXT_PRIMARY, 1);
+
+	/* Botones de control */
+	draw_button(panel_x, panel_y + 150, 90, 28, "RUN", C_GREEN, C_TEXT_PRIMARY, true);
+	draw_button(panel_x + 100, panel_y + 150, 90, 28, "STOP", C_RED, C_TEXT_PRIMARY, false);
+
+	draw_nav_bar(-1);
+}
+
+/* Power Supply */
+static int psu_voltage = 3300;  /* mV */
+static int psu_current = 500;   /* mA */
+
+static void draw_power_supply(uint32_t tick, uint8_t battery)
+{
+	draw_status_bar(tick, battery);
+
+	draw_string(20, 30, "POWER SUPPLY", C_ORANGE, 2);
+	draw_string(20, 58, "DUAL 0-30V / 0-5A", C_TEXT_DIM, 1);
+
+	/* Canal 1 */
+	int y = 85;
+	draw_string(20, y, "CANAL 1", C_ACCENT, 1);
+	draw_progress_bar(20, y + 20, 200, 20, psu_voltage * 100 / 30000, C_GREEN, C_BG_CARD);
+	char vbuf[16];
+	utoa(psu_voltage / 1000, vbuf);
+	int len = strlen(vbuf);
+	vbuf[len] = '.';
+	vbuf[len + 1] = '0' + (psu_voltage / 100) % 10;
+	vbuf[len + 2] = 'V';
+	vbuf[len + 3] = '\0';
+	draw_string(230, y + 22, vbuf, C_GREEN, 2);
+
+	/* Botones +/- */
+	draw_button(20, y + 50, 60, 28, "-", C_BLUE, C_TEXT_PRIMARY, false);
+	draw_button(90, y + 50, 60, 28, "+", C_BLUE, C_TEXT_PRIMARY, false);
+
+	/* Canal 2 */
+	y += 100;
+	draw_string(20, y, "CANAL 2", C_YELLOW, 1);
+	draw_progress_bar(20, y + 20, 200, 20, psu_current * 100 / 5000, C_YELLOW, C_BG_CARD);
+	char ibuf[16];
+	utoa(psu_current, ibuf);
+	int ilen = strlen(ibuf);
+	ibuf[ilen] = 'm';
+	ibuf[ilen + 1] = 'A';
+	ibuf[ilen + 2] = '\0';
+	draw_string(230, y + 22, ibuf, C_YELLOW, 2);
+
+	draw_button(20, y + 50, 60, 28, "-", C_BLUE, C_TEXT_PRIMARY, false);
+	draw_button(90, y + 50, 60, 28, "+", C_BLUE, C_TEXT_PRIMARY, false);
+
+	/* Power ON/OFF */
+	draw_button(350, 200, 100, 36, "ON", C_GREEN, C_TEXT_PRIMARY, true);
+
+	draw_nav_bar(-1);
+}
+
+/* Flipper RF */
+static int flipper_mode = 0;
+static const char *flipper_modes[] = {"SUB-1GHZ", "NFC", "IR", "GPIO"};
+
+static void draw_flipper(uint32_t tick, uint8_t battery)
+{
+	draw_status_bar(tick, battery);
+
+	draw_string(20, 30, "FLIPPER RF", C_PURPLE, 2);
+	draw_string(20, 58, "HERRAMIENTAS INALAMBRICAS", C_TEXT_DIM, 1);
+
+	/* Modos */
+	int y = 90;
+	for (int i = 0; i < 4; i++) {
+		bool is_sel = (i == flipper_mode);
+		uint16_t bg = is_sel ? C_PURPLE : C_BG_CARD;
+		draw_button(20, y, 180, 36, flipper_modes[i], bg, C_TEXT_PRIMARY, is_sel);
+		y += 44;
+	}
+
+	/* Panel de estado */
+	draw_string(250, 90, "ESTADO", C_ACCENT, 1);
+	draw_string(250, 114, "Frecuencia: 433MHz", C_TEXT_PRIMARY, 1);
+	draw_string(250, 134, "Potencia: 10dBm", C_TEXT_PRIMARY, 1);
+	draw_string(250, 154, "Protocol: Manchester", C_TEXT_PRIMARY, 1);
+
+	/* Simulacion de señal */
+	for (int x = 0; x < 200; x++) {
+		float t = (float)x / 200.0f;
+		float val = sinf(2.0f * 3.14159f * 10.0f * t + (float)tick / 200.0f);
+		int sy = 180 + (int)(val * 15);
+		put_pixel(250 + x, sy, C_PURPLE);
+	}
+
+	draw_nav_bar(-1);
+}
+
+/* Settings */
+static int settings_selection = 0;
+static uint32_t settings_timeout = 15;
+static uint8_t settings_brightness = 80;
+static const char *settings_items[] = {"Timeout Susp.", "Brillo Pantalla", "WiFi", "Acerca de"};
+
+static void draw_settings(uint32_t tick, uint8_t battery)
+{
+	draw_status_bar(tick, battery);
+
+	draw_string(20, 30, "SETTINGS", C_ACCENT, 2);
+	draw_string(20, 58, "CONFIGURACION DEL SISTEMA", C_TEXT_DIM, 1);
+
+	int y = 90;
+	for (int i = 0; i < 4; i++) {
+		bool is_sel = (i == settings_selection);
+		uint16_t bg = is_sel ? C_ACCENT_DARK : C_BG_CARD;
+
+		fill_rect(20, y, 440, 36, bg);
+		draw_rect(20, y, 440, 36, is_sel ? C_ACCENT : C_BORDER);
+
+		draw_string(30, y + 10, settings_items[i], C_TEXT_PRIMARY, 1);
+
+		/* Valor */
+		if (i == 0) {
+			char vbuf[16];
+			utoa(settings_timeout, vbuf);
+			strcat(vbuf, "s");
+			draw_string(380, y + 10, vbuf, C_GREEN, 1);
+		} else if (i == 1) {
+			draw_progress_bar(300, y + 8, 100, 20, settings_brightness, C_GREEN, C_BG_CARD);
+		}
+
+		y += 44;
+	}
+
+	draw_nav_bar(-1);
+}
+
+/* About */
+static void draw_about(uint32_t tick, uint8_t battery)
+{
+	draw_status_bar(tick, battery);
+
+	draw_string_centered(40, "GIGASPARK OS", C_ACCENT, 2);
+	draw_string_centered(76, "v1.0 - Dual-Core RTOS", C_TEXT_DIM, 1);
+
+	int y = 110;
+	draw_string_centered(y, "STM32H747XI (M7 480MHz + M4 240MHz)", C_TEXT_SECONDARY, 1);
+	y += 20;
+	draw_string_centered(y, "Zephyr RTOS 4.4.1", C_TEXT_SECONDARY, 1);
+	y += 20;
+	draw_string_centered(y, "Buddy Allocator + zRAM + NVS", C_TEXT_SECONDARY, 1);
+	y += 20;
+	draw_string_centered(y, "KiCad PCB + SDL2 Simulator", C_TEXT_SECONDARY, 1);
+	y += 30;
+	draw_string_centered(y, "github.com/gruposalas2025-ship-it/gigaspark", C_ACCENT, 1);
+	y += 20;
+	draw_string_centered(y, "by Gabo - 2026", C_TEXT_DIM, 1);
+
+	draw_nav_bar(-1);
 }
 
 /* ============================================================
@@ -218,20 +660,19 @@ int main(int argc, char *argv[])
 	(void)argc; (void)argv;
 
 	printf("========================================\n");
-	printf("  Gigaspark OS - Simulador Nativo\n");
+	printf("  Gigaspark OS - Gemelo Digital\n");
 	printf("  Pantalla: %dx%d (ventana %dx%d)\n", SCREEN_W, SCREEN_H, WINDOW_W, WINDOW_H);
-	printf("  FPS: %d\n", TARGET_FPS);
 	printf("  Controles:\n");
 	printf("    Mouse click = Touch\n");
-	printf("    Flechas     = Navegar menu\n");
-	printf("    Enter       = Seleccionar app\n");
-	printf("    Escape      = Volver al launcher\n");
+	printf("    Flechas     = Navegar\n");
+	printf("    Enter       = Seleccionar\n");
+	printf("    Escape      = Volver\n");
+	printf("    1-6         = Abrir app\n");
 	printf("    q           = Salir\n");
 	printf("========================================\n");
 
-	/* Inicializar SDL2 */
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		fprintf(stderr, "Error inicializando SDL2: %s\n", SDL_GetError());
+		fprintf(stderr, "Error SDL2: %s\n", SDL_GetError());
 		return 1;
 	}
 
@@ -242,7 +683,7 @@ int main(int argc, char *argv[])
 		SDL_WINDOW_SHOWN
 	);
 	if (!window) {
-		fprintf(stderr, "Error creando ventana: %s\n", SDL_GetError());
+		fprintf(stderr, "Error ventana: %s\n", SDL_GetError());
 		SDL_Quit();
 		return 1;
 	}
@@ -252,53 +693,32 @@ int main(int argc, char *argv[])
 	if (!renderer) {
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 	}
-	if (!renderer) {
-		fprintf(stderr, "Error creando renderer: %s\n", SDL_GetError());
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-		return 1;
-	}
 
-	/* Textura para el framebuffer */
 	SDL_Texture *texture = SDL_CreateTexture(
 		renderer,
 		SDL_PIXELFORMAT_RGB565,
 		SDL_TEXTUREACCESS_STREAMING,
 		SCREEN_W, SCREEN_H
 	);
-	if (!texture) {
-		fprintf(stderr, "Error creando textura: %s\n", SDL_GetError());
-		SDL_DestroyRenderer(renderer);
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-		return 1;
-	}
 
-	/* Limpiar framebuffer */
-	memset(sim_fb, 0, sizeof(sim_fb));
+	memset(fb, 0, sizeof(fb));
 
-	/* Inicializar API table */
-	printf("Inicializando SDK API...\n");
-	/* La tabla ya esta en la variable global api */
-	(void)api;
-
-	/* Inicializar lista de apps */
-	init_app_list();
-
-	/* Estado del launcher */
 	bool running = true;
-	bool in_launcher = true;
+	int current_screen = 0;  /* 0=launcher */
 	SDL_Event event;
+	uint32_t battery_pct = 100;
 
-	printf("Simulador listo. Ventana abierta.\n");
+	printf("Gemelo digital listo.\n");
 
-	/* ============================================================
-	 * MAIN LOOP
-	 * ============================================================ */
 	while (running) {
 		Uint32 frame_start = SDL_GetTicks();
+		uint32_t tick = frame_start;
 
-		/* Procesar eventos SDL2 */
+		/* Simular bateria bajando */
+		if (tick % 10000 < FRAME_MS) {
+			if (battery_pct > 5) battery_pct--;
+		}
+
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 			case SDL_QUIT:
@@ -307,32 +727,32 @@ int main(int argc, char *argv[])
 
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym) {
-				case SDLK_ESCAPE:
-					if (!in_launcher) {
-						in_launcher = true;
-						printf("[Sim] Volviendo al launcher\n");
-					}
-					break;
 				case SDLK_q:
 					running = false;
 					break;
+				case SDLK_ESCAPE:
+					current_screen = 0;
+					break;
 				case SDLK_UP:
-					if (in_launcher && selected_app > 0) {
-						selected_app--;
-					}
+					if (current_screen == 0 && launcher_selection > 0) launcher_selection--;
+					if (current_screen == 5 && settings_selection > 0) settings_selection--;
 					break;
 				case SDLK_DOWN:
-					if (in_launcher && selected_app < app_count - 1) {
-						selected_app++;
-					}
+					if (current_screen == 0 && launcher_selection < LAUNCHER_APPS - 1) launcher_selection++;
+					if (current_screen == 5 && settings_selection < 3) settings_selection++;
 					break;
 				case SDLK_RETURN:
-					if (in_launcher) {
-						printf("[Sim] App seleccionada: %s\n",
-						       app_list[selected_app].name);
-						in_launcher = false;
+					if (current_screen == 0) {
+						current_screen = launcher_selection + 1;
+						printf("[Sim] Abriendo: %s\n", app_names[launcher_selection]);
 					}
 					break;
+				case SDLK_1: current_screen = 1; break;
+				case SDLK_2: current_screen = 2; break;
+				case SDLK_3: current_screen = 3; break;
+				case SDLK_4: current_screen = 4; break;
+				case SDLK_5: current_screen = 5; break;
+				case SDLK_6: current_screen = 6; break;
 				default:
 					break;
 				}
@@ -342,83 +762,74 @@ int main(int argc, char *argv[])
 				if (event.button.button == SDL_BUTTON_LEFT) {
 					int mx = event.button.x / WINDOW_SCALE;
 					int my = event.button.y / WINDOW_SCALE;
-					sim_set_touch(mx, my, true);
 
-					/* Detectar click en la lista del launcher */
-					if (in_launcher) {
-						int item_y = 60;
-						for (int i = 0; i < app_count; i++) {
-							if (mx >= 20 && mx < SCREEN_W - 20 &&
-							    my >= item_y && my < item_y + 36) {
-								selected_app = i;
-								printf("[Sim] App seleccionada: %s\n",
-								       app_list[i].name);
-								in_launcher = false;
-								break;
+					/* Detectar click en nav bar */
+					if (my >= nav_bar_y) {
+						int btn_w = 120;
+						int gap = (SCREEN_W - btn_w * 3) / 4;
+						for (int i = 0; i < 3; i++) {
+							int bx = gap + i * (btn_w + gap);
+							if (mx >= bx && mx < bx + btn_w &&
+							    my >= nav_bar_y + 7 && my < nav_bar_y + 37) {
+								if (i == 0) current_screen = 0;  /* HOME */
+								if (i == 1 && current_screen > 0) current_screen = 0;  /* BACK */
 							}
-							item_y += 40;
-						}
-
-						/* Detectar click en boton Home */
-						if (my >= SCREEN_H - 35 && my < SCREEN_H - 5 &&
-						    mx >= 190 && mx < 290) {
-							in_launcher = true;
-							printf("[Sim] Home pressed\n");
 						}
 					}
-				}
-				break;
 
-			case SDL_MOUSEBUTTONUP:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					sim_set_touch(0, 0, false);
-				}
-				break;
-
-			case SDL_MOUSEMOTION:
-				if (event.motion.state & SDL_BUTTON_LMASK) {
-					int mx = event.motion.x / WINDOW_SCALE;
-					int my = event.motion.y / WINDOW_SCALE;
-					sim_set_touch(mx, my, true);
+					/* Detectar click en launcher */
+					if (current_screen == 0) {
+						int col_w = 200;
+						int row_h = 50;
+						int start_x = 40;
+						int start_y = 100;
+						for (int i = 0; i < LAUNCHER_APPS; i++) {
+							int col = i % 2;
+							int row = i / 2;
+							int ax = start_x + col * (col_w + 20);
+							int ay = start_y + row * (row_h + 10);
+							if (mx >= ax && mx < ax + col_w && my >= ay && my < ay + row_h) {
+								current_screen = i + 1;
+								printf("[Sim] Abriendo: %s\n", app_names[i]);
+							}
+						}
+					}
 				}
 				break;
 			}
 		}
 
-		/* ---- Renderizar ---- */
+		/* Renderizar */
+		memset(fb, 0, sizeof(fb));
 
-		/* Dibujar segun estado */
-		if (in_launcher) {
-			draw_launcher();
-		} else {
-			/* Pantalla de app en ejecucion */
-			fill_rect(0, 0, SCREEN_W, SCREEN_H, 0x0000);
-			draw_string(20, 20, "Ejecutando:", 0x07FF);
-			draw_string(20, 40, app_list[selected_app].name, 0xFFFF);
-			draw_string(20, 70, app_list[selected_app].desc, 0x7BEF);
-			draw_string(20, 110, "Presiona ESC para volver", 0x7BEF);
-			draw_nav_bar();
+		switch (current_screen) {
+		case 0: draw_launcher(tick, battery_pct); break;
+		case 1: draw_oscilloscope(tick, battery_pct); break;
+		case 2: draw_power_supply(tick, battery_pct); break;
+		case 3: draw_flipper(tick, battery_pct); break;
+		case 4: draw_settings(tick, battery_pct); break;
+		case 5: draw_settings(tick, battery_pct); break;
+		case 6: draw_about(tick, battery_pct); break;
+		default: draw_launcher(tick, battery_pct); break;
 		}
 
-		/* Enviar framebuffer a SDL2 */
-		SDL_UpdateTexture(texture, NULL, sim_fb, SCREEN_W * sizeof(uint16_t));
+		/* Enviar a SDL2 */
+		SDL_UpdateTexture(texture, NULL, fb, SCREEN_W * sizeof(uint16_t));
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, texture, NULL, NULL);
 		SDL_RenderPresent(renderer);
 
-		/* Control de FPS */
 		Uint32 frame_time = SDL_GetTicks() - frame_start;
 		if (frame_time < FRAME_MS) {
 			SDL_Delay(FRAME_MS - frame_time);
 		}
 	}
 
-	/* Limpiar */
 	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 
-	printf("Simulador cerrado.\n");
+	printf("Gemelo digital cerrado.\n");
 	return 0;
 }
