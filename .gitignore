@@ -37,3 +37,4 @@ venv/
 *.bak
 *.orig
 *.rej
+simulator/gigaspark_sim
