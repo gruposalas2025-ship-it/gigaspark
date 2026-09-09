@@ -1,11 +1,13 @@
-# 🔧 Gigaspark OS — The Maker's Mega-Device
+# Gigaspark OS — The Maker's Mega-Device
 
 > **Un sistema operativo dual-core que convierte al Arduino Giga R1 en una navaja suiza de la ingeniería.**
 
 ![STM32H747](https://img.shields.io/badge/STM32H747-Dual--Core-blue)
 ![Zephyr RTOS](https://img.shields.io/badge/Zephyr-RTOS-4.4.1-green)
+![C99](https://img.shields.io/badge/Language-C99-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Version](https://img.shields.io/badge/Version-1.0-red)
+![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
 
 ---
 
@@ -86,78 +88,121 @@
 
 ---
 
-## 📁 Estructura de Directorios
+## Estructura de Directorios
 
 ```
 gigaspark_os/
-├── CMakeLists.txt              # Build principal (M7)
-├── prj.conf                    # Configuracion M7
-├── app.overlay                 # Device Tree overlay M7
+├── .github/workflows/build.yml   # CI/CD pipeline
+├── CMakeLists.txt                 # Build principal (M7)
+├── prj.conf                       # Configuracion M7
+├── app.overlay                    # Device Tree overlay M7
 │
-├── common/                     # Codigo compartido M4/M7
+├── common/                        # Codigo compartido M4/M7
 │   ├── include/
-│   │   ├── ipc_protocol.h      # Comandos IPC
+│   │   ├── ipc_protocol.h         # Comandos IPC
 │   │   └── ...
-│   └── ipc_config.h            # Endpoint IPC
+│   └── ipc_config.h               # Endpoint IPC
 │
-├── m4/                         # Firmware nucleo M4
+├── m4/                            # Firmware nucleo M4
 │   ├── CMakeLists.txt
 │   ├── prj.conf
 │   ├── src/
-│   │   ├── main.c              # M4 main (2 threads)
-│   │   ├── mem_engine.c/h      # 3-tier memory
-│   │   ├── zram_comp.c/h       # RLE compression
-│   │   ├── sd_swap.c/h         # SD swap simulation
-│   │   └── fs_manager.c/h      # FAT32 + Media read
+│   │   ├── main.c                 # M4 main (2 threads)
+│   │   ├── mem_engine.c/h         # 3-tier memory + Buddy
+│   │   ├── zram_comp.c/h          # RLE + LRU eviction
+│   │   ├── sd_swap.c/h            # SD swap simulation
+│   │   └── fs_manager.c/h         # FAT32 + Media read
 │   └── Kconfig
 │
-├── m7/                         # Firmware nucleo M7
+├── m7/                            # Firmware nucleo M7
 │   ├── CMakeLists.txt
 │   ├── prj.conf
 │   ├── src/
-│   │   ├── main.c              # M7 main (2 threads)
-│   │   ├── app_runner.c/h      # App execution + fault recovery
-│   │   ├── fault_manager.c/h   # PendSV + setjmp/longjmp
-│   │   ├── nav_bar.c/h         # Android-style nav bar
-│   │   ├── power_manager.c/h   # Sleep mode (15s)
-│   │   ├── video_decoder.c/h   # JPEG HW decoder
-│   │   ├── audio_i2s.c/h       # I2S audio playback
-│   │   ├── net_manager.c/h     # WiFi (stub)
-│   │   ├── app_downloader.c/h  # HTTP download (stub)
-│   │   └── hw/                 # Drivers Mega-Dispositivo
+│   │   ├── main.c                 # M7 main (2 threads)
+│   │   ├── app_runner.c/h         # App execution + fault recovery
+│   │   ├── fault_manager.c/h      # PendSV + setjmp/longjmp
+│   │   ├── nav_bar.c/h            # Android-style nav bar
+│   │   ├── power_manager.c/h      # Sleep mode (configurable)
+│   │   ├── video_decoder.c/h      # JPEG HW decoder
+│   │   ├── audio_i2s.c/h          # I2S audio playback
+│   │   ├── net_manager.c/h        # WiFi (stub)
+│   │   ├── app_downloader.c/h     # HTTP download (stub)
+│   │   └── hw/                    # Drivers Mega-Dispositivo
 │   │       ├── oscilloscope.c/h
 │   │       ├── power_supply.c/h
 │   │       └── rf_tools.c/h
 │   └── Kconfig
 │
-├── sdk/                        # API exportada a apps
+├── sdk/                           # API exportada a apps
 │   ├── gigaspark_api.h
 │   └── gigaspark_api.c
 │
-├── test_apps/                  # Apps de usuario
-│   ├── clicker/main.c          # Touch demo
-│   ├── oscilloscope_app/main.c # Osciloscopio
-│   ├── power_supply_app/main.c # Fuente lab
-│   └── flipper_app/main.c      # Herramientas RF
+├── simulator/                     # Simulador nativo SDL2
+│   ├── main.c
+│   ├── sdk_stubs.c
+│   ├── CMakeLists.txt
+│   └── Makefile
 │
-├── hardware/                   # Diseno KiCad
+├── test_apps/                     # Apps de usuario
+│   ├── clicker/main.c
+│   ├── oscilloscope_app/main.c
+│   ├── power_supply_app/main.c
+│   ├── settings_app/main.c
+│   └── flipper_app/main.c
+│
+├── tests/unit/                    # Tests unitarios (ZTEST)
+│   ├── mem_engine/
+│   │   └── test_buddy_allocator.c
+│   └── zram_comp/
+│       └── test_zram_lru.c
+│
+├── hardware/                      # Diseno KiCad
 │   └── Gigaspark_Mega/
 │       ├── Gigaspark_Mega.kicad_pro
 │       ├── Gigaspark_Mega.kicad_sch
+│       ├── Gigaspark_Mega.kicad_pcb
 │       └── docs/
 │           ├── BLOCK1_DESIGN.md
 │           ├── BLOCK2_DESIGN.md
 │           ├── BLOCK3_DESIGN.md
-│           └── BLOCK4_DESIGN.md
+│           ├── BLOCK4_DESIGN.md
+│           └── PCB_LAYOUT_GUIDE.md
 │
-├── BUILD.md                    # Guia de compilacion
-├── HARDWARE.md                 # Guia de ensamblaje
-└── README.md                   # Este archivo
+├── docs/
+│   ├── Doxyfile                   # Generacion Doxygen
+│   ├── SIMULATOR.md               # Guia del simulador
+│   └── API.md
+│
+├── BUILD.md                       # Guia de compilacion
+├── HARDWARE.md                    # Guia de ensamblaje
+├── LICENSE                        # MIT License
+└── README.md                      # Este archivo
 ```
 
 ---
 
-## 🚀 Inicio Rapido
+## Quick Start (Simulador)
+
+Ejecuta Gigaspark OS en tu PC sin hardware fisico:
+
+```bash
+# Instalar dependencias
+sudo pacman -S sdl2 gcc make pkgconf    # Arch/CachyOS
+sudo apt install libsdl2-dev gcc make pkg-config  # Ubuntu/Debian
+
+# Compilar y ejecutar
+cd simulator
+make
+./gigaspark_sim
+```
+
+La ventana se abre con el launcher. Usa el mouse como touch, flechas para navegar, Enter para seleccionar, ESC para volver.
+
+Ver [docs/SIMULATOR.md](docs/SIMULATOR.md) para instrucciones detalladas.
+
+---
+
+## Inicio Rapido (Hardware)
 
 ```bash
 # Clonar el repositorio
@@ -181,28 +226,30 @@ El diseño del PCB esta en `hardware/Gigaspark_Mega/`. Ver [HARDWARE.md](HARDWAR
 
 ---
 
-## 📊 Metricas del Sistema
+## Metricas del Sistema
 
 | Metrica | Valor |
 |---------|-------|
-| Flash M7 | 140 KB / 768 KB (18%) |
+| Flash M7 | 143 KB / 768 KB (18%) |
 | RAM M7 | 125 KB / 512 KB (24%) |
-| Flash M4 | 64 KB |
-| Total binarios | 204 KB |
-| Hilos estrictos | 4 (2x2) |
-| Commits | 18 |
-| Phases completadas | 15 |
+| Flash M4 | 61 KB |
+| RAM M4 | 40 KB (31%) |
+| Tests | 18/18 passing |
+| Commits | 23 |
+| Phases | 22 completadas |
 
 ---
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 - **RTOS:** Zephyr 4.4.1
 - **MCU:** STM32H747XI (Cortex-M7 480MHz + M4 240MHz)
 - **GUI:** LVGL 9.5.0
 - **IPC:** OpenAMP/RPMsg
+- **Simulador:** SDL2 nativo (sin dependencias Zephyr)
 - **Hardware Design:** KiCad 10.0.6
 - **Lenguaje:** C puro (C99/C11)
+- **CI/CD:** GitHub Actions
 
 ---
 

@@ -1,0 +1,116 @@
+name: Gigaspark OS CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build-m7:
+    name: Build M7 Firmware
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Zephyr SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            git cmake ninja-build gperf ccache \
+            dfu-util device-tree-compiler \
+            python3-pip python3-venv python3-setuptools \
+            gcc-arm-none-eabi libnewlib-arm-none-eabi
+          pip3 install west
+          west init -l .
+          west update
+
+      - name: Build M7
+        run: |
+          source ~/zephyr/zephyr-env.sh
+          west build -b arduino_giga_r1/stm32h747xx/m7
+
+      - name: Upload M7 binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: gigaspark-m7
+          path: build/zephyr/zephyr.bin
+
+  build-m4:
+    name: Build M4 Firmware
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Zephyr SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            git cmake ninja-build gperf ccache \
+            dfu-util device-tree-compiler \
+            python3-pip python3-venv python3-setuptools \
+            gcc-arm-none-eabi libnewlib-arm-none-eabi
+          pip3 install west
+          west init -l .
+          west update
+
+      - name: Build M4
+        run: |
+          source ~/zephyr/zephyr-env.sh
+          west build -b arduino_giga_r1/stm32h747xx/m4
+
+      - name: Upload M4 binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: gigaspark-m4
+          path: build/zephyr/zephyr.bin
+
+  test:
+    name: Unit Tests (native_sim)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Zephyr SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            git cmake ninja-build gperf ccache \
+            python3-pip python3-venv python3-setuptools
+          pip3 install west
+          west init -l .
+          west update
+
+      - name: Run Buddy Allocator tests
+        run: |
+          source ~/zephyr/zephyr-env.sh
+          rm -rf build_test_buddy
+          west build -b native_sim --build-dir build_test_buddy tests/unit/mem_engine
+          ./build_test_buddy/zephyr/zephyr.exe
+
+      - name: Run zRAM LRU tests
+        run: |
+          source ~/zephyr/zephyr-env.sh
+          rm -rf build_test_zram
+          west build -b native_sim --build-dir build_test_zram tests/unit/zram_comp
+          ./build_test_zram/zephyr/zephyr.exe
+
+  build-simulator:
+    name: Build Simulator (SDL2)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SDL2
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev gcc make pkg-config
+
+      - name: Build Simulator
+        run: |
+          cd simulator
+          make
+
+      - name: Verify binary
+        run: |
+          file simulator/gigaspark_sim
