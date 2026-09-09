@@ -13,6 +13,7 @@
  */
 
 #include "power_manager.h"
+#include "settings_store.h"
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -78,6 +79,17 @@ static void inactivity_timeout_handler(struct k_timer *timer)
 void power_manager_init(void)
 {
 	LOG_INF("Inicializando gestor de energia...");
+
+	/* Cargar timeout guardado desde Flash */
+	uint32_t saved_timeout = settings_store_load_timeout();
+	if (saved_timeout > 0) {
+		sleep_timeout_s = saved_timeout;
+		LOG_INF("Timeout cargado de Flash: %u s", sleep_timeout_s);
+	} else {
+		/* Primera vez: guardar valor por defecto */
+		settings_store_save_timeout(sleep_timeout_s);
+		LOG_INF("Usando timeout por defecto: %u s", sleep_timeout_s);
+	}
 
 	/* Configurar timer de inactividad */
 	k_timer_start(&inactivity_timer, K_SECONDS(sleep_timeout_s),
@@ -155,13 +167,16 @@ void power_set_timeout(uint32_t seconds)
 
 	sleep_timeout_s = seconds;
 
+	/* Guardar en Flash para persistencia entre reinicios */
+	settings_store_save_timeout(sleep_timeout_s);
+
 	/* Reiniciar timer con el nuevo valor si esta inicializado */
 	if (power_initialized) {
 		k_timer_start(&inactivity_timer, K_SECONDS(sleep_timeout_s),
 			      K_SECONDS(sleep_timeout_s));
 	}
 
-	LOG_INF("Timeout de suspension cambiado a %u s", sleep_timeout_s);
+	LOG_INF("Timeout de suspension cambiado a %u s (guardado en Flash)", sleep_timeout_s);
 }
 
 uint32_t power_get_timeout(void)

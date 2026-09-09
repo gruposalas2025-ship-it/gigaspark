@@ -14,6 +14,7 @@ target_sources(app PRIVATE
 	m7/src/fault_manager.c
 	m7/src/nav_bar.c
 	m7/src/power_manager.c
+	m7/src/settings_store.c
 	m7/src/video_decoder.c
 	m7/src/audio_i2s.c
 	m7/src/hw/oscilloscope.c
