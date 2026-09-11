@@ -38,3 +38,4 @@ venv/
 *.orig
 *.rej
 simulator/gigaspark_sim
+docs/api/
