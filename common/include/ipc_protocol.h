@@ -47,12 +47,18 @@ enum ipc_status {
 	STATUS_ERR_MEDIA_CLOSE = -16,
 };
 
+/* Maximum read/write payload per IPC message. Keep messages bounded for RPMsg. */
+#define MEM_IO_MAX          24
+#define IPC_PAYLOAD_MAX     MEM_IO_MAX
+
 /* IPC message structure (fixed size for OpenAMP safety) */
 struct __packed ipc_msg {
 	uint8_t  cmd;       /* enum ipc_cmd */
 	int8_t   status;    /* enum ipc_status (response only) */
 	uint16_t handle;    /* opaque memory handle or file descriptor */
-	uint32_t size;      /* requested/actual size */
+	uint32_t size;      /* requested/actual size or offset */
+	uint16_t seq;       /* request/response sequence number */
+	uint8_t  payload[IPC_PAYLOAD_MAX]; /* bounded inline payload */
 };
 
 /* Maximum memory pool size managed by M4 */
@@ -63,9 +69,6 @@ struct __packed ipc_msg {
 
 /* Maximum single allocation size */
 #define MEM_MAX_ALLOC       1024
-
-/* Maximum read/write payload per IPC message */
-#define MEM_IO_MAX          24
 
 /* Handle value meaning "invalid" */
 #define MEM_HANDLE_INVALID  0xFFFF
